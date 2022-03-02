@@ -1,0 +1,10 @@
+@import url("../node_modules/primeicons/primeicons.css");
+@import url("../node_modules/primeng/resources/themes/lara-light-indigo/theme.css");
+@import url("../node_modules/primeng/resources/primeng.min.css");
+body{
+    padding: 2rem;
+}
+:host ::ng-deep .p-rowgroup-footer td {
+    font-weight: 700;
+}
+
