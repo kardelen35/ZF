@@ -1,11 +1,17 @@
-import { Component } from '@angular/core';
+import { Component, ElementRef, OnDestroy } from '@angular/core';
 import { OnInit } from '@angular/core';
 import { LazyLoadEvent, SortEvent } from 'primeng/api';
 import { CustomerServiceService } from './customer-service.service';
 import { launchDimensions, launchMaturity, Product } from './customer';
 import { textChangeRangeIsUnchanged } from 'typescript';
 import { FormControl } from '@angular/forms';
-import { filter, map, Observable, startWith } from 'rxjs';
+import { debounceTime, distinctUntilChanged, filter, map, Observable, startWith, Subject } from 'rxjs';
+import * as xlsx from "xlsx";
+import * as FileSaver from 'file-saver';
+import 'jspdf';
+
+
+
 
 @Component({
   selector: 'app-root',
@@ -15,36 +21,34 @@ import { filter, map, Observable, startWith } from 'rxjs';
 export class AppComponent {
   title = 'zf-project';
 
-  totalRecords: number;
-
+  totalRecords: number; 
   cols: any[];
-  test: any[];
-
+  selectedProducts: any[];
   loading: boolean;
-
+  dataHistory:boolean;
   launchMaturity: any[];
   launchDimensions: any[];
   product:Product[];
   productFormControl:FormControl
-
-  // Search Text
-  
   options:any[];
-  filteredOptions:Observable<string[]>;
-
-  
+  filteredOptions:Observable<string[] | null>;
   lockedlaunchDimension: any[];
-
+  exportColumns:any[];
   selectedCustomers: launchDimensions[];
-  localStorageData:[];
+  localStorageData:any[];
+  dataProduct = new Array();
+  private isScrolled: boolean = false;
 
-  constructor(private customerService: CustomerServiceService) {}
+
+  constructor() {}
+  
 
   ngOnInit() {
-    //Search Text 
     this.productFormControl = new FormControl();
     this.filteredOptions = this.productFormControl.valueChanges.pipe(
     startWith(''),
+    debounceTime(1000),
+    distinctUntilChanged(),
     map(value=>this.productFilter(value))
     )
     
@@ -124,7 +128,7 @@ export class AppComponent {
         secondValue: 100.0,
         actualValue: 87.0,
         isReleased: true,
-        dateOfRelease: '2022-02-17T00:00:00',
+        dateOfRelease: '2022-02-18T00:00:00',
         amount: 500.0,
         launchDimensionName: 'OEE',
       },
@@ -144,7 +148,7 @@ export class AppComponent {
         secondValue: 85.0,
         actualValue: 27.06,
         isReleased: true,
-        dateOfRelease: '2022-02-17T00:00:00',
+        dateOfRelease: '2022-02-18T00:00:00',
         amount: 5555.0,
         launchDimensionName: 'Process Capability Analysis in Manufacturing',
       },
@@ -164,7 +168,7 @@ export class AppComponent {
         secondValue: 0.0,
         actualValue: 100.0,
         isReleased: true,
-        dateOfRelease: '2022-02-17T00:00:00',
+        dateOfRelease: '2022-02-18T00:00:00',
         amount: 500.0,
         launchDimensionName: '# of NCT',
       },
@@ -184,7 +188,7 @@ export class AppComponent {
         secondValue: 0.0,
         actualValue: 35.0,
         isReleased: true,
-        dateOfRelease: '2022-02-17T00:00:00',
+        dateOfRelease: '2022-02-20T00:00:00',
         amount: 523.0,
         launchDimensionName: '# of Pending Eng Changes',
       },
@@ -204,7 +208,7 @@ export class AppComponent {
         secondValue: 0.0,
         actualValue: 47.0,
         isReleased: true,
-        dateOfRelease: '2022-02-17T00:00:00',
+        dateOfRelease: '2022-02-20T00:00:00',
         amount: 523.0,
         launchDimensionName: '# of Safety Incidents',
       },
@@ -224,7 +228,7 @@ export class AppComponent {
         secondValue: 300.0,
         actualValue: 14.0,
         isReleased: true,
-        dateOfRelease: '2022-02-17T00:00:00',
+        dateOfRelease: '2022-02-20T00:00:00',
         amount: 2300.0,
         launchDimensionName: 'Process Approval',
       },
@@ -244,7 +248,7 @@ export class AppComponent {
         secondValue: 100.0,
         actualValue: 10.0,
         isReleased: true,
-        dateOfRelease: '2022-02-17T00:00:00',
+        dateOfRelease: '2022-02-20T00:00:00',
         amount: 500.0,
         launchDimensionName: 'Availability - Set Up Performance',
       },
@@ -264,7 +268,7 @@ export class AppComponent {
         secondValue: 32.0,
         actualValue: 34.38,
         isReleased: true,
-        dateOfRelease: '2022-02-17T00:00:00',
+        dateOfRelease: '2022-02-20T00:00:00',
         amount: 123.0,
         launchDimensionName: 'Productivity - Fulfillment of Cycle Time',
       },
@@ -375,7 +379,6 @@ export class AppComponent {
         lmVersion: null,
         ldId: 57,
         metricType: 'Percentage',
-
         maturityOrderNo: 0,
         category: 'ZF1',
         metricResponsible: 'muhammed',
@@ -390,6 +393,7 @@ export class AppComponent {
         launchDimensionName: '# of Open 8D for Purchased Components',
       },
     ];
+    
     this.launchDimensions = [
       {
         id: 1,
@@ -520,16 +524,51 @@ export class AppComponent {
       category: 'ZF1',
       metricType: 'Percentage'
     }]
-    this.product = [
-      { id:1,name:"playstation",category:"game",price:3000,stock:2},
-      { id:2,name:"player",category:"game",price:2000,stock:5},
-      { id:3,name:"Bilgisayar",category:"Teknoloji",price:8000,stock:8},
-      {id: 4,name: "kindle", category: "books", price:2000, stock: 4},
-      {id: 5,name: "coffee table",category: "mobilya",price:345,stock: 6},
-      {id: 6,name: "lamp",category: "books",price:345,stock: 5},
-      {id: 7,name: "reeder",category: "books",price:456,stock: 9}
-    ]
+    this.cols = [
+      { field: 'dateOfRelease', header: 'Date'},
+      { field: 'ldId', header: 'Id' },
+      { field: 'project', header: 'Project' },
+      { field: 'maturityOrderNo', header: 'Maturity Order No' },
+      { field: 'category', header: 'Category' },
+      { field: 'amount', header: 'Amount' },
+      { field: 'metricType', header: 'Metric Type' },
+
+
+  ];
+    // this.product = [
+    //   { id:1,name:"playstation",category:"Game",price:3000,stock:2},
+    //   { id:2,name:"player",category:"Game",price:2000,stock:5},
+    //   { id:3,name:"Bilgisayar",category:"Technology",price:8000,stock:8},
+    //   {id: 4,name: "kindle", category: "Books", price:2000, stock: 4},
+    //   {id: 5,name: "coffee table",category: "Furniture",price:345,stock: 6},
+    //   {id: 6,name: "lamp",category: "Books",price:345,stock: 5},
+    //   {id: 7,name: "reeder",category: "Books",price:456,stock: 9}
+    // ]
+    this.exportColumns=this.cols.map(col=>({title:col.header,dataKey:col.field}));
   }
+
+  exportExcel() {
+    import("xlsx").then(xlsx => {
+        const worksheet = xlsx.utils.json_to_sheet(this.exportColumns);
+        const workbook = { Sheets: { 'data': worksheet }, SheetNames: ['data'] };
+        const excelBuffer: any = xlsx.write(workbook, { bookType: 'xlsx', type: 'array' });
+        this.saveAsExcelFile(excelBuffer, "products");
+    });
+}
+public getLaunchDimensionMetricType(dimensionId: number)  {
+  let metric =  this.launchMaturity.find(a => a.ldId == dimensionId).metricType 
+  return metric ? 'Percentage' ? '%' : '#' :null;
+    
+ 
+}
+saveAsExcelFile(buffer: any, fileName: string): void {
+  let EXCEL_TYPE = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8';
+  let EXCEL_EXTENSION = '.xlsx';
+  const data: Blob = new Blob([buffer], {
+      type: EXCEL_TYPE
+  });
+  FileSaver.saveAs(data, fileName + '_export_' + new Date().getTime() + EXCEL_EXTENSION);
+}
   private productFilter(value:string):any[]{
    let searchData = JSON.parse(localStorage.getItem("searchData") || '[]')
    searchData += []
@@ -537,9 +576,12 @@ export class AppComponent {
    const workingProduct = isDataMax ? searchData.split(',') :searchData;
    const updateProduct = workingProduct.concat(value);
 
-   localStorage.setItem("searchData",JSON.stringify(updateProduct))
-  
- 
+   if(value && value != ""){
+    localStorage.setItem("searchData",JSON.stringify(updateProduct))
+    const localData = localStorage.getItem('searchData');
+    
+   }
+
     this.options=this.product.map(product=>product.name)
     const filterValue = value.toString().toLocaleLowerCase();
     return this.options.filter(option =>option.toString().toLocaleLowerCase().includes(filterValue));
@@ -560,21 +602,9 @@ export class AppComponent {
         return val1.id < val2.id ? -1 : 1;
     });
 }
-  getData() {
-    this.test=this.launchMaturity.filter((a) => {
-      return this.launchDimensions.some((b) => {
-        return a.ldId === b.id;
-      });
-    });
-  }
-  // public getLaunchDimensionMetricType(Id:any) : string {
-  //   return this.launchDimensions.find(a => a.id === Id).metricType === "Percentage" ? "%" : "#"
-  // }
-  public productSearch(){
-    return this.product.filter(a=>console.log("A",a))
-  }
+
+  
   loadCustomers(event: LazyLoadEvent) {
-    this.getData();
     setTimeout(() => {
       this.launchDimensions.forEach((data) => {
         const dimensionsData = Object.keys(data);
@@ -582,7 +612,13 @@ export class AppComponent {
       });
     }, 1000);
   }
+  displayFn(p?: any):any{
+    
+   
+     
 
+      
+    }
 
   applyFilter(event: Event) {
     const filterValue = (event.target as HTMLInputElement).value;
@@ -591,7 +627,6 @@ export class AppComponent {
     });
   }
   customSort(event: any) {
-    console.log('Sorted', event);
     event.data.sort((data1: any, data2: any) => {
       let value1 = data1[event.field];
       let value2 = data2[event.field];
