@@ -26,6 +26,9 @@ import { ReactiveFormsModule} from '@angular/forms';
 import {MatAutocompleteModule} from '@angular/material/autocomplete';
 import {MatInputModule} from '@angular/material/input';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { PercentPipe } from '@angular/common';
+import {AutoCompleteModule} from 'primeng/autocomplete';
+
 
 
 
@@ -34,7 +37,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 @NgModule({
   declarations: [
     AppComponent,
-    MetricTypePipe
+    MetricTypePipe,
   ],
   imports: [
     BrowserModule,
@@ -58,11 +61,12 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
     MatFormFieldModule,
     MatAutocompleteModule,
     MatInputModule,
-    BrowserAnimationsModule
+    BrowserAnimationsModule,
+    AutoCompleteModule
     
     
   ],
-  providers: [],
+  providers: [MetricTypePipe,PercentPipe],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

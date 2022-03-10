@@ -1,14 +1,12 @@
-import { Component, ElementRef, OnDestroy } from '@angular/core';
-import { OnInit } from '@angular/core';
-import { LazyLoadEvent, SortEvent } from 'primeng/api';
-import { CustomerServiceService } from './customer-service.service';
-import { launchDimensions, launchMaturity, Product } from './customer';
-import { textChangeRangeIsUnchanged } from 'typescript';
+import { Component } from '@angular/core';
+import { LazyLoadEvent } from 'primeng/api';
+import { launchDimensions, Product } from './customer';
 import { FormControl } from '@angular/forms';
-import { debounceTime, distinctUntilChanged, filter, map, Observable, startWith, Subject } from 'rxjs';
-import * as xlsx from "xlsx";
+import { debounceTime, distinctUntilChanged, filter, map, Observable, startWith } from 'rxjs';
 import * as FileSaver from 'file-saver';
-import 'jspdf';
+import { MetricTypePipe } from './metric-type.pipe';
+import { PercentPipe } from '@angular/common';
+import {ViewEncapsulation} from '@angular/core'
 
 
 
@@ -17,6 +15,8 @@ import 'jspdf';
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css'],
+  encapsulation : ViewEncapsulation.Emulated
+
 })
 export class AppComponent {
   title = 'zf-project';
@@ -28,7 +28,7 @@ export class AppComponent {
   dataHistory:boolean;
   launchMaturity: any[];
   launchDimensions: any[];
-  product:Product[];
+  products:any[];
   productFormControl:FormControl
   options:any[];
   filteredOptions:Observable<string[] | null>;
@@ -37,10 +37,15 @@ export class AppComponent {
   selectedCustomers: launchDimensions[];
   localStorageData:any[];
   dataProduct = new Array();
-  private isScrolled: boolean = false;
+
+  //Search
+
+  search:string;
+  results: string[];
 
 
-  constructor() {}
+  constructor() {
+  }
   
 
   ngOnInit() {
@@ -535,30 +540,75 @@ export class AppComponent {
 
 
   ];
-    // this.product = [
-    //   { id:1,name:"playstation",category:"Game",price:3000,stock:2},
-    //   { id:2,name:"player",category:"Game",price:2000,stock:5},
-    //   { id:3,name:"Bilgisayar",category:"Technology",price:8000,stock:8},
-    //   {id: 4,name: "kindle", category: "Books", price:2000, stock: 4},
-    //   {id: 5,name: "coffee table",category: "Furniture",price:345,stock: 6},
-    //   {id: 6,name: "lamp",category: "Books",price:345,stock: 5},
-    //   {id: 7,name: "reeder",category: "Books",price:456,stock: 9}
-    // ]
+  //Search
+    this.products = [
+      { id:1,name:"playstation",category:"Game",price:3000,stock:2},
+      { id:2,name:"player",category:"Game",price:2000,stock:5},
+      { id:3,name:"Bilgisayar",category:"Technology",price:8000,stock:8},
+      {id: 4,name: "kindle", category: "Books", price:2000, stock: 4},
+      {id: 5,name: "coffee table",category: "Furniture",price:345,stock: 6},
+      {id: 6,name: "lamp",category: "Books",price:345,stock: 5},
+      {id: 7,name: "reeder",category: "Books",price:456,stock: 9}
+    ]
     this.exportColumns=this.cols.map(col=>({title:col.header,dataKey:col.field}));
   }
+  
+  //Search 
+  public searchProduct(event:any) {
+    console.log("Event",event)
+   
+   
+      let filtered:any[] = [];
+      let query = event.query;
+      console.log("query",query)
+      for(let i = 0; i<this.products.length; i++){
+        let p = this.products[i]
+        
+        if(p.name.toLowerCase().indexOf(query.toLowerCase()) == 0){
+          filtered.push(p.name)
+        }
+        this.results = filtered;
+      }
+      let result = this.results.includes(query)
+      if(result== false){
+        setTimeout(()=>{
+          let searchData = JSON.parse(localStorage.getItem("searchData") || '[]')
+          searchData += []
+          const isDataMax = searchData.length
+          const workingProduct = isDataMax ? searchData.split(',') :searchData;
+          const updateProduct = workingProduct.concat(query);
+          localStorage.setItem("searchData",JSON.stringify(updateProduct))
+        },1000)
+      
+
+      }
+   
+
+  
+  
+}
 
   exportExcel() {
     import("xlsx").then(xlsx => {
-        const worksheet = xlsx.utils.json_to_sheet(this.exportColumns);
+        const worksheet = xlsx.utils.json_to_sheet(this.launchMaturity);
         const workbook = { Sheets: { 'data': worksheet }, SheetNames: ['data'] };
         const excelBuffer: any = xlsx.write(workbook, { bookType: 'xlsx', type: 'array' });
         this.saveAsExcelFile(excelBuffer, "products");
     });
 }
+
 public getLaunchDimensionMetricType(dimensionId: number)  {
-  let metric =  this.launchMaturity.find(a => a.ldId == dimensionId).metricType 
-  return metric ? 'Percentage' ? '%' : '#' :null;
-    
+  
+//  this.percent.transform(this.launchMaturity.find(a => a.ldId == dimensionId).metricType)
+// this.launchMaturity.forEach((this.launchMaturity.find(a => a.ldId == dimensionId).metricType, dimensionId)) => {
+//   if(){}
+// })
+// this.launchMaturity.forEach((p,i)=>{
+//   this.launchMaturity[i].metricType = this.launchMaturity[i].metricType 
+
+ 
+// })
+
  
 }
 saveAsExcelFile(buffer: any, fileName: string): void {
@@ -582,7 +632,7 @@ saveAsExcelFile(buffer: any, fileName: string): void {
     
    }
 
-    this.options=this.product.map(product=>product.name)
+    this.options=this.products.map(product=>product.name)
     const filterValue = value.toString().toLocaleLowerCase();
     return this.options.filter(option =>option.toString().toLocaleLowerCase().includes(filterValue));
 

@@ -1,15 +1,25 @@
 
-    <p-table #dt selectionMode="multiple" [exportHeader]="'customExportHeader'"  [(selection)]="selectedProducts"   rowGroupMode="rowspan" groupRowsBy="dateOfRelease" sortField="dateOfRelease"   dataKey="id"  [columns]="cols"    [showCurrentPageReport]="true" scrollHeight="800px" sortMode="multiple" [value]="launchMaturity"   (onLazyLoad)="loadCustomers($event)"  (sortFunction)="customSort($event)"
+<!-- SEARCH BOX / AUTOCOMPLETE -->
+<p-autoComplete [(ngModel)]="search" [suggestions]="results" (completeMethod)="searchProduct($event)"></p-autoComplete>
+
+   
+   
+   
+   
+   
+   
+   
+   <!-- <p-table responsiveLayout="scroll" styleClass="myStyleClass" #dt selectionMode="multiple" [exportHeader]="'customExportHeader'"  [(selection)]="selectedProducts"   rowGroupMode="rowspan" groupRowsBy="dateOfRelease" sortField="dateOfRelease"   dataKey="id"  [columns]="cols"    [showCurrentPageReport]="true" scrollHeight="800px" sortMode="multiple" [value]="launchMaturity"   (onLazyLoad)="loadCustomers($event)"  (sortFunction)="customSort($event)"
     [rows]="10" [paginator]="true"  [loading]="loading" [globalFilterFields]="['date','ldId','projectNo',  'maturityOrderNo','category','amount','metricType']">
   
   <ng-template pTemplate="caption">
     <div class="flex">
         <button type="button" pButton pRipple icon="pi pi-file" (click)="dt.exportCSV()" class="mr-2" pTooltip="CSV" tooltipPosition="bottom"></button>
-        <button type="button" pButton pRipple icon="pi pi-file-excel" (click)="exportExcel()" class="p-button-success mr-2"  pTooltip="XLS" tooltipPosition="bottom"></button>
+       <button type="button" pButton pRipple icon="pi pi-file-excel" (click)="exportExcel()" class="p-button-success mr-2"  pTooltip="XLS" tooltipPosition="bottom"></button> 
     </div>
   </ng-template>
   
-  <ng-template pTemplate="header"  >
+  <ng-template   pTemplate="header"  >
       
       <tr   >
           <th>
@@ -64,11 +74,11 @@
           <td>{{customer.maturityOrderNo}}</td>
           <td>{{customer.category}}</td>
           <td>{{customer.amount}}</td>
-          <td>{{customer.dimMetricType }}</td>
+          <td>{{customer.metricType | metricType }}</td>
         
 
 
       </tr>
   </ng-template>
-</p-table>
+</p-table> -->
 

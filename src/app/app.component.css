@@ -24,7 +24,19 @@
     }
 
 } */
-.box{
-  background-color: aquamarine;
+ 
+  
+     .p-component .myStyleClass ::ng-deep{
+      background-color: blue !important;
+     }
+     .p-datatable .p-datatable-header .ui-state-active ::ng-deep{
+       color: blueviolet !important;
+     }
+     p-table .myStyleClass ::ng-deep{
+       background-color: aquamarine;
+       color: brown;
 
-}
+     }
+    
+  
+  
