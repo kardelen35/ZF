@@ -8,11 +8,11 @@ body{
     font-weight: 700;
 }
 
-.p-datatable .p-datatable-header .ui-state-active ::ng-deep{
+/* .p-datatable .p-datatable-header .ui-state-active ::ng-deep{
     background-color: blueviolet !important;
   }
   p-table .myStyleClass {
     background-color: aquamarine;
     color: brown;
 
-  }
+  } */

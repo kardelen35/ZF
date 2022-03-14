@@ -1,15 +1,16 @@
 
 <!-- SEARCH BOX / AUTOCOMPLETE -->
-<p-autoComplete [(ngModel)]="search" [suggestions]="results" (completeMethod)="searchProduct($event)"></p-autoComplete>
 
    
+   <div style="margin-bottom: 20px;">
+    <p-autoComplete   [dropdown]="true" [(ngModel)]="search" [suggestions]="results" (completeMethod)="searchProduct($event)"></p-autoComplete>
+   </div>
    
    
    
    
-   
-   
-   <!-- <p-table responsiveLayout="scroll" styleClass="myStyleClass" #dt selectionMode="multiple" [exportHeader]="'customExportHeader'"  [(selection)]="selectedProducts"   rowGroupMode="rowspan" groupRowsBy="dateOfRelease" sortField="dateOfRelease"   dataKey="id"  [columns]="cols"    [showCurrentPageReport]="true" scrollHeight="800px" sortMode="multiple" [value]="launchMaturity"   (onLazyLoad)="loadCustomers($event)"  (sortFunction)="customSort($event)"
+<!--    
+   <p-table  editMode="row"  #dt selectionMode="multiple" [exportHeader]="'customExportHeader'"  [(selection)]="selectedProducts"   rowGroupMode="rowspan" groupRowsBy="dateOfRelease" sortField="dateOfRelease"   dataKey="ldId"  [columns]="cols"    [showCurrentPageReport]="true"  sortMode="multiple" [value]="formatData"   (onLazyLoad)="loadCustomers($event)"  (sortFunction)="customSort($event)"
     [rows]="10" [paginator]="true"  [loading]="loading" [globalFilterFields]="['date','ldId','projectNo',  'maturityOrderNo','category','amount','metricType']">
   
   <ng-template pTemplate="caption">
@@ -45,6 +46,9 @@
           <th>
               <p-columnFilter type="text" field="metricType"></p-columnFilter>
           </th>
+          <th>
+           
+        </th>
       </tr>
       <tr style=" position: -webkit-sticky;
       position: sticky;
@@ -59,26 +63,96 @@
           <th pResizableColumn pSortableColumn="category">category <p-sortIcon field="category"></p-sortIcon></th>
           <th pResizableColumn pSortableColumn="amount">amount <p-sortIcon field="amount"></p-sortIcon></th>
           <th pResizableColumn pSortableColumn="metricType">metricType <p-sortIcon field="metricType"></p-sortIcon></th>
+          <th pResizableColumn ></th>
+
 
       </tr>
 
   </ng-template>
 
-  <ng-template pTemplate="body"  let-customer let-index="rowIndex" let-rowIndex="rowIndex" let-rowgroup="rowgroup"
+  <ng-template pTemplate="body" let-editing="editing" let-ri="rowIndex"  let-customer let-index="rowIndex" let-rowIndex="rowIndex" let-rowgroup="rowgroup"
   let-rowspan="rowspan">
-      <tr *ngIf=" {dimMetricType: getLaunchDimensionMetricType(customer.ldId)}">
+      <tr [pEditableRow]="customer">
 
-          <td *ngIf="rowgroup" [attr.rowspan]="rowspan">{{customer.dateOfRelease }}</td>
-          <td>{{customer.ldId }}</td>
-          <td>{{customer.projectNo}}</td>
-          <td>{{customer.maturityOrderNo}}</td>
-          <td>{{customer.category}}</td>
-          <td>{{customer.amount}}</td>
-          <td>{{customer.metricType | metricType }}</td>
+          <td  *ngIf="rowgroup" [attr.rowspan]="rowspan">{{customer.dateOfRelease }}</td>
+          <td>
+              <p-cellEditor>
+                  <ng-template pTemplate="input">
+                      <input pInputText type="text" [(ngModel)]="customer.ldId" required>
+                  </ng-template>
+                  <ng-template pTemplate="output">
+                      {{customer.ldId}}
+                  </ng-template>
+              </p-cellEditor>
+             
+            </td>
+          <td>
+            <p-cellEditor>
+            <ng-template pTemplate="input">
+                <input pInputText type="text" [(ngModel)]="customer.projectNo" required>
+            </ng-template>
+            <ng-template pTemplate="output">
+              {{customer.projectNo}}
+            </ng-template>
+        </p-cellEditor>
+            </td>
+
+          <td>
+            <p-cellEditor>
+            <ng-template pTemplate="input">
+                <input pInputText type="text" [(ngModel)]="customer.maturityOrderNo" required>
+            </ng-template>
+            <ng-template pTemplate="output">
+              {{customer.maturityOrderNo}}
+            </ng-template>
+        </p-cellEditor>
+            </td>
+          <td>
+            <p-cellEditor>
+
+            <ng-template pTemplate="input">
+                <input pInputText type="text" [(ngModel)]="customer.category" required>
+            </ng-template>
+            <ng-template pTemplate="output">
+                {{customer.category}}
+              </ng-template>
+            </p-cellEditor>
+
+            </td>
+          <td>
+            <p-cellEditor>
+
+            <ng-template pTemplate="input">
+                <input pInputText type="text" [(ngModel)]="customer.amount" required>
+            </ng-template>
+            <ng-template pTemplate="output">
+                {{customer.amount}}
+            </ng-template>
+        </p-cellEditor>
+
+            </td>
+
+          <td>
+            <p-cellEditor>
+                <ng-template pTemplate="input">
+                    <input pInputText type="text" [ngModel]="customer.metricType" (ngModelChange)="customer.metricType=$event" required>
+                </ng-template>
+                <ng-template pTemplate="output">
+                    {{customer.metricType }}               
+                 </ng-template>
+            </p-cellEditor>
+
+             
+            </td>
+            <td style="text-align:center">
+                <button *ngIf="!editing" pButton pRipple type="button" pInitEditableRow icon="pi pi-pencil" (click)="onRowEditInit(customer)" class="p-button-rounded p-button-text"></button>
+                <button *ngIf="editing" pButton pRipple type="button" pSaveEditableRow icon="pi pi-check" (click)="onRowEditSave(customer)" class="p-button-rounded p-button-text p-button-success mr-2"></button>
+                <button *ngIf="editing" pButton pRipple type="button" pCancelEditableRow icon="pi pi-times" (click)="onRowEditCancel(customer, ri)" class="p-button-rounded p-button-text p-button-danger"></button>
+            </td>
         
 
 
       </tr>
   </ng-template>
-</p-table> -->
-
+</p-table>
+ -->

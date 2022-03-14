@@ -48,5 +48,14 @@
     "karma-jasmine": "~4.0.0",
     "karma-jasmine-html-reporter": "~1.7.0",
     "typescript": "~4.5.2"
+  },
+  "bit": {
+    "env": {},
+    "componentsDefaultDirectory": "components/{name}",
+    "packageManager": "npm"
+  },
+  "peerDependencies": {
+    "@angular/core": ">=8.0.0",
+    "@angular/common": ">=8.0.0"
   }
 }

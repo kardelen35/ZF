@@ -2,10 +2,9 @@ import { Component } from '@angular/core';
 import { LazyLoadEvent } from 'primeng/api';
 import { launchDimensions, Product } from './customer';
 import { FormControl } from '@angular/forms';
-import { debounceTime, distinctUntilChanged, filter, map, Observable, startWith } from 'rxjs';
+import { debounceTime, distinctUntilChanged, map, Observable, startWith } from 'rxjs';
 import * as FileSaver from 'file-saver';
 import { MetricTypePipe } from './metric-type.pipe';
-import { PercentPipe } from '@angular/common';
 import {ViewEncapsulation} from '@angular/core'
 
 
@@ -32,19 +31,17 @@ export class AppComponent {
   productFormControl:FormControl
   options:any[];
   filteredOptions:Observable<string[] | null>;
-  lockedlaunchDimension: any[];
   exportColumns:any[];
-  selectedCustomers: launchDimensions[];
   localStorageData:any[];
-  dataProduct = new Array();
+  formatData:any[];
 
   //Search
 
   search:string;
   results: string[];
+  clonedProducts: any[];
 
-
-  constructor() {
+  constructor(private metricPipe:MetricTypePipe) {
   }
   
 
@@ -520,19 +517,10 @@ export class AppComponent {
         metricType: 'Percentage',
       },
     ];
-    this.lockedlaunchDimension=[{
-      launchMaturityId: 219,
-      projectNo: '0000025690',
-      lmVersion: null,
-      maturityOrderNo: 0,
-      amount: 123.0,
-      category: 'ZF1',
-      metricType: 'Percentage'
-    }]
     this.cols = [
       { field: 'dateOfRelease', header: 'Date'},
       { field: 'ldId', header: 'Id' },
-      { field: 'project', header: 'Project' },
+      { field: 'projectNo', header: 'Project' },
       { field: 'maturityOrderNo', header: 'Maturity Order No' },
       { field: 'category', header: 'Category' },
       { field: 'amount', header: 'Amount' },
@@ -540,6 +528,9 @@ export class AppComponent {
 
 
   ];
+  this.formatProduct(this.launchMaturity)
+  
+
   //Search
     this.products = [
       { id:1,name:"playstation",category:"Game",price:3000,stock:2},
@@ -552,15 +543,20 @@ export class AppComponent {
     ]
     this.exportColumns=this.cols.map(col=>({title:col.header,dataKey:col.field}));
   }
-  
+  public formatProduct(value:any){
+    this.formatData = []
+    value.map((a:any)=> this.formatData.push(a))
+    for(let i = 0; i<this.formatData.length; i++){
+      let type = this.formatData[i].metricType
+      let metric =this.metricPipe.transform(type)
+      this.formatData[i].metricType = metric
+    }
+   
+  }
   //Search 
-  public searchProduct(event:any) {
-    console.log("Event",event)
-   
-   
+  public searchProduct(event:any) {   
       let filtered:any[] = [];
       let query = event.query;
-      console.log("query",query)
       for(let i = 0; i<this.products.length; i++){
         let p = this.products[i]
         
@@ -570,8 +566,10 @@ export class AppComponent {
         this.results = filtered;
       }
       let result = this.results.includes(query)
-      if(result== false){
+
+      if(result == false){
         setTimeout(()=>{
+          debounceTime(200)
           let searchData = JSON.parse(localStorage.getItem("searchData") || '[]')
           searchData += []
           const isDataMax = searchData.length
@@ -579,38 +577,35 @@ export class AppComponent {
           const updateProduct = workingProduct.concat(query);
           localStorage.setItem("searchData",JSON.stringify(updateProduct))
         },1000)
-      
-
       }
-   
-
-  
-  
 }
+onRowEditInit(product: any) {
+
+  this.clonedProducts = {...product};
+ 
+}
+onRowEditCancel(product: Product, index: number) {
+  this.launchMaturity[index] = this.clonedProducts[product.id];
+  delete this.clonedProducts[product.id];
+}
+onRowEditSave(product: any) {
+  this.clonedProducts
+  this.clonedProducts = Object.keys(product)
+  return this.clonedProducts
+
+}
+
 
   exportExcel() {
     import("xlsx").then(xlsx => {
-        const worksheet = xlsx.utils.json_to_sheet(this.launchMaturity);
+        const worksheet = xlsx.utils.json_to_sheet(this.formatData);
         const workbook = { Sheets: { 'data': worksheet }, SheetNames: ['data'] };
         const excelBuffer: any = xlsx.write(workbook, { bookType: 'xlsx', type: 'array' });
         this.saveAsExcelFile(excelBuffer, "products");
     });
 }
 
-public getLaunchDimensionMetricType(dimensionId: number)  {
-  
-//  this.percent.transform(this.launchMaturity.find(a => a.ldId == dimensionId).metricType)
-// this.launchMaturity.forEach((this.launchMaturity.find(a => a.ldId == dimensionId).metricType, dimensionId)) => {
-//   if(){}
-// })
-// this.launchMaturity.forEach((p,i)=>{
-//   this.launchMaturity[i].metricType = this.launchMaturity[i].metricType 
 
- 
-// })
-
- 
-}
 saveAsExcelFile(buffer: any, fileName: string): void {
   let EXCEL_TYPE = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8';
   let EXCEL_EXTENSION = '.xlsx';
@@ -638,20 +633,6 @@ saveAsExcelFile(buffer: any, fileName: string): void {
 
   }
 
-  toggleLock(data:any, frozen:any, index:any) {
-    if (frozen) {
-        this.lockedlaunchDimension = this.lockedlaunchDimension.filter((c, i) => i !== index);
-        this.launchMaturity.push(data);
-    }
-    else {
-        this.launchMaturity = this.launchMaturity.filter((c, i) => i !== index);
-        this.lockedlaunchDimension.push(data);
-    }
-
-    this.launchMaturity.sort((val1, val2) => {
-        return val1.id < val2.id ? -1 : 1;
-    });
-}
 
   
   loadCustomers(event: LazyLoadEvent) {
