@@ -9,42 +9,42 @@
    
    
    
-<!--    
-   <p-table  editMode="row"  #dt selectionMode="multiple" [exportHeader]="'customExportHeader'"  [(selection)]="selectedProducts"   rowGroupMode="rowspan" groupRowsBy="dateOfRelease" sortField="dateOfRelease"   dataKey="ldId"  [columns]="cols"    [showCurrentPageReport]="true"  sortMode="multiple" [value]="formatData"   (onLazyLoad)="loadCustomers($event)"  (sortFunction)="customSort($event)"
-    [rows]="10" [paginator]="true"  [loading]="loading" [globalFilterFields]="['date','ldId','projectNo',  'maturityOrderNo','category','amount','metricType']">
+   
+   <p-table (onFilter)="handleFilter($event)" headerCheckboxToggleAllPages = true  styleClass="p-datatable-gridlines"  editMode="row"  #dt  [exportHeader]="'customExportHeader'"  [(selection)]="selectedProducts"   rowGroupMode="rowspan" groupRowsBy="dateOfRelease" sortField="dateOfRelease"   dataKey="ldId"  [columns]="cols"    [showCurrentPageReport]="true"  sortMode="multiple" [value]="formatData"   (onLazyLoad)="loadCustomers($event)"  (sortFunction)="customSort($event)"
+    [rows]="10" [paginator]="true"   [loading]="loading" [globalFilterFields]="['dateOfRelease','ldId','projectNo',  'maturityOrderNo','category','amount','metricType']">
   
-  <ng-template pTemplate="caption">
-    <div class="flex">
-        <button type="button" pButton pRipple icon="pi pi-file" (click)="dt.exportCSV()" class="mr-2" pTooltip="CSV" tooltipPosition="bottom"></button>
-       <button type="button" pButton pRipple icon="pi pi-file-excel" (click)="exportExcel()" class="p-button-success mr-2"  pTooltip="XLS" tooltipPosition="bottom"></button> 
+  <ng-template pTemplate="caption"   >
+    <div class="flex" >
+        <button type="button" pButton pRipple icon="pi pi-file" (click)="dt.exportCSV()" style="margin-right: 5px;" pTooltip="CSV" tooltipPosition="bottom"></button>
+       <button type="button"  pButton pRipple icon="pi pi-file-excel" (click)="exportExcel()" class="p-button-success mr-2"  pTooltip="XLS" tooltipPosition="bottom"></button> 
     </div>
   </ng-template>
   
-  <ng-template   pTemplate="header"  >
+  <ng-template  pTemplate="header"   >
       
-      <tr   >
+      <tr>
           <th>
-              <p-columnFilter type="text" field="date"></p-columnFilter>
+              <p-columnFilter matchMode="contains" type="text" field="date"></p-columnFilter>
           </th>
           <th>
-              <p-columnFilter type="text" field="ldId"></p-columnFilter>
+              <p-columnFilter matchMode="contains" type="text" field="ldId"></p-columnFilter>
           </th>
 
           <th>
-              <p-columnFilter type="text" field="projectNo"></p-columnFilter>
+              <p-columnFilter matchMode="contains" type="text" field="projectNo"></p-columnFilter>
           </th>
         
           <th>
-              <p-columnFilter type="text" field="maturityOrderNo"></p-columnFilter>
+              <p-columnFilter matchMode="contains" type="text" field="maturityOrderNo"></p-columnFilter>
           </th>
           <th>
-              <p-columnFilter type="text" field="category"></p-columnFilter>
+              <p-columnFilter matchMode="contains" type="text" field="category"></p-columnFilter>
           </th>
           <th>
-              <p-columnFilter type="text" field="amount"></p-columnFilter>
+              <p-columnFilter matchMode="contains" type="text" field="amount"></p-columnFilter>
           </th>
           <th>
-              <p-columnFilter type="text" field="metricType"></p-columnFilter>
+              <p-columnFilter matchMode="contains" type="text" field="metricType"></p-columnFilter>
           </th>
           <th>
            
@@ -52,11 +52,10 @@
       </tr>
       <tr style=" position: -webkit-sticky;
       position: sticky;
-      background-color:red;
       color:white;
       top:0px;
       z-index:1"  >
-          <th   pResizableColumn pSortableColumn="date"  >Date <p-sortIcon field="date"></p-sortIcon></th>
+          <th pResizableColumn pSortableColumn="dateOfRelease"  >Date <p-sortIcon field="date"></p-sortIcon></th>
           <th pResizableColumn pSortableColumn="ldId">ldId <p-sortIcon field="ldId"></p-sortIcon></th>
           <th pResizableColumn pSortableColumn="projectNo">projectNo <p-sortIcon field="projectNo"></p-sortIcon></th>
           <th pResizableColumn pSortableColumn="maturityOrderNo">maturityOrderNo <p-sortIcon field="maturityOrderNo"></p-sortIcon></th>
@@ -72,9 +71,9 @@
 
   <ng-template pTemplate="body" let-editing="editing" let-ri="rowIndex"  let-customer let-index="rowIndex" let-rowIndex="rowIndex" let-rowgroup="rowgroup"
   let-rowspan="rowspan">
-      <tr [pEditableRow]="customer">
-
-          <td  *ngIf="rowgroup" [attr.rowspan]="rowspan">{{customer.dateOfRelease }}</td>
+ 
+      <tr  [pEditableRow]="customer">
+        <td  *ngIf="rowgroup" [attr.rowspan]="rowspan">{{customer.dateOfRelease }}</td>
           <td>
               <p-cellEditor>
                   <ng-template pTemplate="input">
@@ -96,7 +95,6 @@
             </ng-template>
         </p-cellEditor>
             </td>
-
           <td>
             <p-cellEditor>
             <ng-template pTemplate="input">
@@ -155,4 +153,4 @@
       </tr>
   </ng-template>
 </p-table>
- -->
+

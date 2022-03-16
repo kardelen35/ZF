@@ -16,3 +16,28 @@ body{
     color: brown;
 
   } */
+
+
+.p-datatable.p-datatable-gridlines .p-datatable-tbody > tr >td:hover{
+  background: rgb(5, 198, 223);
+}  
+.p-datatable.p-datatable-gridlines .p-datatable-tbody  >tr >td{
+  background-color: #043050;
+  color: white;
+}
+.p-datatable.p-datatable-gridlines .p-datatable-header{
+  background-color: #043050;
+}
+.p-datatable.p-datatable-gridlines .p-datatable-thead > tr > th{
+  background-color: #043050;
+  color: white;
+}
+.p-datatable.p-datatable-gridlines .p-datatable-thead > tr > th:hover{
+  background: rgb(5, 198, 223);
+}
+.p-datatable .p-sortable-column .p-sortable-column-icon{
+  color: white !important;
+}
+span.pi.pi-filter-icon.pi-filter {
+  color: white;
+}

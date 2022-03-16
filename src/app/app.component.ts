@@ -34,6 +34,7 @@ export class AppComponent {
   exportColumns:any[];
   localStorageData:any[];
   formatData:any[];
+  sortableAndFilteredData:any[]
 
   //Search
 
@@ -529,6 +530,7 @@ export class AppComponent {
 
   ];
   this.formatProduct(this.launchMaturity)
+  this.handleFilter(this.formatData)
   
 
   //Search
@@ -552,6 +554,11 @@ export class AppComponent {
       this.formatData[i].metricType = metric
     }
    
+  }
+  public handleFilter(value:any){
+    this.sortableAndFilteredData = [];
+    value.filteredValue.map((a:any)=>this.sortableAndFilteredData.push(a))
+  
   }
   //Search 
   public searchProduct(event:any) {   
@@ -579,13 +586,14 @@ export class AppComponent {
         },1000)
       }
 }
+
 onRowEditInit(product: any) {
 
   this.clonedProducts = {...product};
  
 }
 onRowEditCancel(product: Product, index: number) {
-  this.launchMaturity[index] = this.clonedProducts[product.id];
+  this.formatData[index] = this.clonedProducts[product.id];
   delete this.clonedProducts[product.id];
 }
 onRowEditSave(product: any) {
@@ -598,7 +606,8 @@ onRowEditSave(product: any) {
 
   exportExcel() {
     import("xlsx").then(xlsx => {
-        const worksheet = xlsx.utils.json_to_sheet(this.formatData);
+      console.log("xlsx",xlsx)
+        const worksheet = xlsx.utils.json_to_sheet(this.sortableAndFilteredData);
         const workbook = { Sheets: { 'data': worksheet }, SheetNames: ['data'] };
         const excelBuffer: any = xlsx.write(workbook, { bookType: 'xlsx', type: 'array' });
         this.saveAsExcelFile(excelBuffer, "products");
