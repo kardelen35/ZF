@@ -26,9 +26,7 @@
 } */
  
   
-     .p-component .myStyleClass ::ng-deep{
-      background-color: blue !important;
-     }
+
      /* .p-datatable .p-datatable-header .ui-state-active ::ng-deep{
        color: blueviolet !important;
      }
