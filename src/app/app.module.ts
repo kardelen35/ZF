@@ -28,7 +28,6 @@ import {MatInputModule} from '@angular/material/input';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { PercentPipe } from '@angular/common';
 import {AutoCompleteModule} from 'primeng/autocomplete';
-import { TableComponent } from './component/table/table.component';
 
 
 
@@ -39,7 +38,6 @@ import { TableComponent } from './component/table/table.component';
   declarations: [
     AppComponent,
     MetricTypePipe,
-    TableComponent,
   ],
   imports: [
     BrowserModule,
@@ -68,7 +66,7 @@ import { TableComponent } from './component/table/table.component';
     
     
   ],
-  providers: [MetricTypePipe,PercentPipe],
-  bootstrap: [AppComponent,TableComponent]
+  providers: [MetricTypePipe],
+  bootstrap: [AppComponent]
 })
 export class AppModule { }
