@@ -28,16 +28,14 @@ import {MatInputModule} from '@angular/material/input';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { PercentPipe } from '@angular/common';
 import {AutoCompleteModule} from 'primeng/autocomplete';
-
-
-
-
+import { WireVersionPipe } from './wire-version.pipe';
 
 
 @NgModule({
   declarations: [
     AppComponent,
     MetricTypePipe,
+    WireVersionPipe,
   ],
   imports: [
     BrowserModule,
@@ -62,11 +60,12 @@ import {AutoCompleteModule} from 'primeng/autocomplete';
     MatAutocompleteModule,
     MatInputModule,
     BrowserAnimationsModule,
-    AutoCompleteModule
+    AutoCompleteModule,
+    
     
     
   ],
-  providers: [MetricTypePipe],
+  providers: [MetricTypePipe,WireVersionPipe],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

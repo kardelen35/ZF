@@ -1,163 +1,426 @@
-
 <!-- SEARCH BOX / AUTOCOMPLETE -->
 
-   
-<div style="margin-bottom: 20px;">
-    <p-autoComplete   [dropdown]="true" [(ngModel)]="search" [suggestions]="results" (completeMethod)="searchProduct($event)"></p-autoComplete>
-   </div>
-   
-   
-   
-   
-   
-   <p-table (onFilter)="handleFilter($event)"  styleClass="p-datatable-gridlines"  editMode="row"  #dt  [exportHeader]="'customExportHeader'"  [(selection)]="selectedProducts"   rowGroupMode="rowspan" groupRowsBy="dateOfRelease" sortField="dateOfRelease"   dataKey="ldId"  [columns]="cols"    [showCurrentPageReport]="true"  sortMode="multiple" [value]="formatData"   (sortFunction)="customSort($event)"
-    [rows]="10" [paginator]="true" (selectionChange)="onSelectionChange($event)"   [loading]="loading" >
-  
-  <ng-template pTemplate="caption"   >
-    <div class="flex" >
-        <button type="button" pButton pRipple icon="pi pi-file" (click)="dt.exportCSV()" style="margin-right: 5px;" pTooltip="CSV" tooltipPosition="bottom"></button>
-       <button type="button"  pButton pRipple icon="pi pi-file-excel" (click)="exportExcel()" class="p-button-success mr-2"  pTooltip="XLS" tooltipPosition="bottom"></button> 
+<div style="margin-bottom: 20px">
+  <p-autoComplete
+    [dropdown]="true"
+    [(ngModel)]="search"
+    [suggestions]="results"
+    (completeMethod)="searchProduct($event)"
+  ></p-autoComplete>
+</div>
+
+<p-table
+  [globalFilterFields]="['value', 'metricType']"
+  [responsive]="true"
+  responsiveLayout="stack"
+  (onFilter)="handleFilter($event)"
+  styleClass="p-datatable-gridlines"
+  style="font-size: 8px"
+  editMode="row"
+  #dt
+  [exportHeader]="'customExportHeader'"
+  [(selection)]="selectedProducts"
+  rowGroupMode="rowspan"
+  groupRowsBy="dateOfRelease"
+  sortField="dateOfRelease"
+  dataKey="id"
+  [columns]="cols"
+  [showCurrentPageReport]="true"
+  sortMode="multiple"
+  [value]="formatData"
+  (sortFunction)="customSort($event)"
+  [rows]="10"
+  (selectionChange)="onSelectionChange($event)"
+  [loading]="loading"
+>
+  <ng-template pTemplate="caption">
+    <div class="flex" style="padding: 2px">
+      <button
+        type="button"
+        pButton
+        pRipple
+        icon="pi pi-file"
+        (click)="dt.exportCSV()"
+        style="margin-right: 5px"
+        pTooltip="CSV"
+        tooltipPosition="bottom"
+      ></button>
+      <button
+        type="button"
+        pButton
+        pRipple
+        icon="pi pi-file-excel"
+        (click)="exportExcel()"
+        class="p-button-success mr-2"
+        pTooltip="XLS"
+        tooltipPosition="bottom"
+      ></button>
+      <input
+        pInputText
+        type="text"
+        (input)="
+          dt.filter($any($event.target).value, 'filterDataWire', 'contains')
+        "
+        (onChange)="onwireVersionChange($event)"
+        placeholder="Global Search"
+      />
     </div>
   </ng-template>
-  
-  <ng-template  pTemplate="header"   >
-      
-      <tr>
-        <th style="width: 3rem">
-            <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
-        </th>
-          <th>
-              <p-columnFilter matchMode="contains" type="text" field="date"></p-columnFilter>
-          </th>
-          <th>
-              <p-columnFilter matchMode="contains" type="text" field="ldId"></p-columnFilter>
-          </th>
 
-          <th>
-              <p-columnFilter matchMode="contains" type="text" field="projectNo"></p-columnFilter>
-          </th>
-        
-          <th>
-              <p-columnFilter matchMode="contains" type="text" field="maturityOrderNo"></p-columnFilter>
-          </th>
-          <th>
-              <p-columnFilter matchMode="contains" type="text" field="category"></p-columnFilter>
-          </th>
-          <th>
-              <p-columnFilter matchMode="contains" type="text" field="amount"></p-columnFilter>
-          </th>
-          <th>
-              <p-columnFilter matchMode="contains" type="text" field="metricType"></p-columnFilter>
-          </th>
-          <th>
-           
-        </th>
-      </tr>
-      <tr style=" position: -webkit-sticky;
-      position: sticky;
-      color:white;
-      top:0px;
-      z-index:1"  >
-        <th style="width: 3rem"></th>
-    
-          <th pResizableColumn pSortableColumn="dateOfRelease"  >Date <p-sortIcon field="date"></p-sortIcon></th>
-          <th pResizableColumn pSortableColumn="ldId">ldId <p-sortIcon field="ldId"></p-sortIcon></th>
-          <th pResizableColumn pSortableColumn="projectNo">projectNo <p-sortIcon field="projectNo"></p-sortIcon></th>
-          <th pResizableColumn pSortableColumn="maturityOrderNo">maturityOrderNo <p-sortIcon field="maturityOrderNo"></p-sortIcon></th>
-          <th pResizableColumn pSortableColumn="category">category <p-sortIcon field="category"></p-sortIcon></th>
-          <th pResizableColumn pSortableColumn="amount">amount <p-sortIcon field="amount"></p-sortIcon></th>
-          <th pResizableColumn pSortableColumn="metricType">metricType <p-sortIcon field="metricType"></p-sortIcon></th>
-          <th pResizableColumn ></th>
+  <ng-template pTemplate="header" let-customerData>
+    <tr>
+      <th style="width: 3rem">
+        <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
+      </th>
+      <th>
+        <p-columnFilter
+          matchMode="contains"
+          type="text"
+          field="date"
+        ></p-columnFilter>
+      </th>
+      <th>
+        <p-columnFilter
+          matchMode="contains"
+          type="text"
+          field="id"
+        ></p-columnFilter>
+      </th>
+      <th>
+        <p-columnFilter
+          matchMode="contains"
+          type="text"
+          field="sdText"
+        ></p-columnFilter>
+      </th>
 
+      <th>
+        <p-columnFilter
+          matchMode="contains"
+          type="text"
+          field="projectNumber"
+        ></p-columnFilter>
+      </th>
 
-      </tr>
+      <th>
+        <p-columnFilter
+          matchMode="contains"
+          type="text"
+          field="version"
+        ></p-columnFilter>
+      </th>
+      <th>
+        <p-columnFilter
+          matchMode="contains"
+          type="text"
+          field="softwareDimensionId"
+        ></p-columnFilter>
+      </th>
+      <th>
+        <p-columnFilter
+          matchMode="contains"
+          type="text"
+          field="plannedValue"
+        ></p-columnFilter>
+      </th>
+      <th>
+        <p-columnFilter
+          matchMode="contains"
+          type="text"
+          field="actualValue"
+        ></p-columnFilter>
+      </th>
 
+      <th></th>
+    </tr>
+
+    <tr>
+      <th style="width: 3rem"></th>
+
+      <th pResizableColumn pSortableColumn="date">
+        Date <p-sortIcon field="date"></p-sortIcon>
+      </th>
+      <th pResizableColumn pSortableColumn="id">
+        Id <p-sortIcon field="id"></p-sortIcon>
+      </th>
+      <th pResizableColumn pSortableColumn="sdText">
+        sdText <p-sortIcon field="sdText"></p-sortIcon>
+      </th>
+      <th pResizableColumn pSortableColumn="projectNumber">
+        project Number <p-sortIcon field="projectNumber"></p-sortIcon>
+      </th>
+      <th pResizableColumn pSortableColumn="version">
+        Version <p-sortIcon field="version"></p-sortIcon>
+      </th>
+      <th pResizableColumn pSortableColumn="softwareDimensionId">
+        Software Dimension <p-sortIcon field="softwareDimensionId"></p-sortIcon>
+      </th>
+      <th pResizableColumn pSortableColumn="plannedValue">
+        plannedValue <p-sortIcon field="plannedValue"></p-sortIcon>
+      </th>
+      <th pResizableColumn pSortableColumn="actualValue">
+        Actual Value <p-sortIcon field="actualValue"></p-sortIcon>
+      </th>
+
+      <th pResizableColumn></th>
+    </tr>
   </ng-template>
 
-  <ng-template pTemplate="body" let-editing="editing" let-ri="rowIndex"  let-customer let-index="rowIndex" let-rowIndex="rowIndex" let-rowgroup="rowgroup"
-  let-rowspan="rowspan">
- 
-      <tr  [pEditableRow]="customer">
-        <td>
-            <p-tableCheckbox [value]="customer"></p-tableCheckbox>
-        </td>
-        <td  *ngIf="rowgroup" [attr.rowspan]="rowspan">{{customer.dateOfRelease }}</td>
-          <td>
-              <p-cellEditor>
-                  <ng-template pTemplate="input">
-                      <input pInputText type="text" [(ngModel)]="customer.ldId" required>
-                  </ng-template>
-                  <ng-template pTemplate="output">
-                      {{customer.ldId}}
-                  </ng-template>
-              </p-cellEditor>
-             
-            </td>
-          <td>
-            <p-cellEditor>
-            <ng-template pTemplate="input">
-                <input pInputText type="text" [(ngModel)]="customer.projectNo" required>
-            </ng-template>
-            <ng-template pTemplate="output">
-              {{customer.projectNo}}
-            </ng-template>
+  <ng-template
+    let-rowData
+    let-columns="columns"
+    pTemplate="body"
+    let-editing="editing"
+    let-ri="rowIndex"
+    let-customer
+    let-rowgroup="rowgroup"
+    let-rowspan="rowspan"
+  >
+    <tr [pEditableRow]="customer">
+      <td>
+        <p-tableCheckbox [value]="customer"></p-tableCheckbox>
+      </td>
+
+      <td>
+        <p-cellEditor>
+          <ng-template pTemplate="input">
+            <input type="text" pInputText [(ngModel)]="customer.date" />
+          </ng-template>
+          <ng-template pTemplate="output">
+            {{ customer.date }}
+          </ng-template>
         </p-cellEditor>
-            </td>
-          <td>
-            <p-cellEditor>
-            <ng-template pTemplate="input">
-                <input pInputText type="text" [(ngModel)]="customer.maturityOrderNo" required>
-            </ng-template>
-            <ng-template pTemplate="output">
-              {{customer.maturityOrderNo}}
-            </ng-template>
+      </td>
+      <td>
+        <p-cellEditor>
+          <ng-template pTemplate="input">
+            <input type="text" pInputText [(ngModel)]="customer.id" />
+          </ng-template>
+          <ng-template pTemplate="output">
+            {{ customer.id }}
+          </ng-template>
         </p-cellEditor>
-            </td>
-          <td>
-            <p-cellEditor>
-
-            <ng-template pTemplate="input">
-                <input pInputText type="text" [(ngModel)]="customer.category" required>
-            </ng-template>
-            <ng-template pTemplate="output">
-                {{customer.category}}
-              </ng-template>
-            </p-cellEditor>
-
-            </td>
-          <td>
-            <p-cellEditor>
-
-            <ng-template pTemplate="input">
-                <input pInputText type="text" [(ngModel)]="customer.amount" required>
-            </ng-template>
-            <ng-template pTemplate="output">
-                {{customer.amount}}
-            </ng-template>
+      </td>
+      <td>
+        <p-cellEditor>
+          <ng-template pTemplate="input">
+            <input type="text" pInputText [(ngModel)]="customer.sdText" />
+          </ng-template>
+          <ng-template pTemplate="output">
+            {{ customer.sdText }}
+          </ng-template>
         </p-cellEditor>
+      </td>
+      <td>
+        <p-cellEditor>
+          <ng-template pTemplate="input">
+            <input
+              type="text"
+              pInputText
+              [(ngModel)]="customer.projectNumber"
+            />
+          </ng-template>
+          <ng-template pTemplate="output">
+            {{ customer.projectNumber }}
+          </ng-template>
+        </p-cellEditor>
+      </td>
 
-            </td>
+      <td>
+        <p-cellEditor>
+          <ng-template pTemplate="input">
+            <input type="text" pInputText [(ngModel)]="customer.version" />
+          </ng-template>
+          <ng-template pTemplate="output">
+            {{ customer.version }}
+          </ng-template>
+        </p-cellEditor>
+      </td>
+      <td>
+        <p-cellEditor>
+          <ng-template pTemplate="input">
+            <input
+              type="text"
+              pInputText
+              [(ngModel)]="customer.softwareDimensionId"
+            />
+          </ng-template>
+          <ng-template pTemplate="output">
+            {{ customer.softwareDimensionId }}
+          </ng-template>
+        </p-cellEditor>
+      </td>
+      <td>
+        <p-cellEditor>
+          <ng-template pTemplate="input">
+            <input type="text" pInputText [(ngModel)]="customer.plannedValue" />
+          </ng-template>
+          <ng-template pTemplate="output">
+            {{ customer.plannedValue }}
+          </ng-template>
+        </p-cellEditor>
+      </td>
+      <td>
+        <p-cellEditor>
+          <ng-template pTemplate="input">
+            <input type="text" pInputText [(ngModel)]="customer.actualValue" />
+          </ng-template>
+          <ng-template pTemplate="output">
+            {{ customer.actualValue }}
+          </ng-template>
+        </p-cellEditor>
+      </td>
 
-          <td>
-            <p-cellEditor>
-                <ng-template pTemplate="input">
-                    <input pInputText type="text" [ngModel]="customer.metricType" (ngModelChange)="customer.metricType=$event" required>
-                </ng-template>
-                <ng-template pTemplate="output">
-                    {{customer.metricType }}               
-                 </ng-template>
-            </p-cellEditor>
+      <td
+        style="text-align: center"
+        *ngIf="formatData && ri === formatData.length - 1"
+      >
+        <button
+          *ngIf="!editing"
+          pButton
+          pRipple
+          type="button"
+          pInitEditableRow
+          icon="pi pi-pencil"
+          (click)="onRowEditInit(customer)"
+          class="p-button-rounded p-button-text"
+        ></button>
+        <button
+          *ngIf="editing"
+          pButton
+          pRipple
+          type="button"
+          pSaveEditableRow
+          icon="pi pi-check"
+          (click)="onRowEditSave(customer)"
+          class="p-button-rounded p-button-text p-button-success mr-2"
+        ></button>
+        <button
+          *ngIf="editing"
+          pButton
+          pRipple
+          type="button"
+          pCancelEditableRow
+          icon="pi pi-times"
+          (click)="onRowEditCancel(customer, ri)"
+          class="p-button-rounded p-button-text p-button-danger"
+        ></button>
+      </td>
+    </tr>
+    <tr *ngIf="addMode && ri === formatData.length - 1 || formatData.length<=1">
+      <td></td>
+      <td rowspan="2">
+        <p-calendar
+          appendTo="body"
+          inputId="basic"
+          [(ngModel)]="newAttribute.date"
+        ></p-calendar>
+      </td>
+      <td>
+        <input
+          class="form-control"
+          type="text"
+          pInputText
+          required
+          value="id"
+          id="newAttributeid"
+          [(ngModel)]="newAttribute.id"
+          name="newAttributeid"
+        />
+      </td>
+      <td>
+        <input
+          class="form-control"
+          type="text"
+          pInputText
+          required
+          id="newAttributesdText"
+          [(ngModel)]="newAttribute.sdText"
+          name="newAttributesdText"
+        />
+      </td>
+      <td>
+        <input
+          class="form-control"
+          type="text"
+          pInputText
+          required
+          id="newAttributeprojectNumber"
+          [(ngModel)]="newAttribute.projectNumber"
+          name="newAttributeprojectNumber"
+        />
+      </td>
 
-             
-            </td>
-            <td style="text-align:center">
-                <button *ngIf="!editing" pButton pRipple type="button" pInitEditableRow icon="pi pi-pencil" (click)="onRowEditInit(customer)" class="p-button-rounded p-button-text"></button>
-                <button *ngIf="editing" pButton pRipple type="button" pSaveEditableRow icon="pi pi-check" (click)="onRowEditSave(customer)" class="p-button-rounded p-button-text p-button-success mr-2"></button>
-                <button *ngIf="editing" pButton pRipple type="button" pCancelEditableRow icon="pi pi-times" (click)="onRowEditCancel(customer, ri)" class="p-button-rounded p-button-text p-button-danger"></button>
-            </td>
-        
-
-
-      </tr>
+      <td>
+        <input
+          class="form-control"
+          type="text"
+          pInputText
+          required
+          id="newAttributeversion"
+          [(ngModel)]="newAttribute.version"
+          name="newAttributeversion"
+        />
+      </td>
+      <td>
+        <input
+          class="form-control"
+          type="text"
+          pInputText
+          required
+          id="newAttributesoftwareDimensionId"
+          [(ngModel)]="newAttribute.softwareDimensionId"
+          name="newAttributesoftwareDimensionId"
+        />
+      </td>
+      <td>
+        <input
+          class="form-control"
+          type="text"
+          pInputText
+          required
+          id="newAttributeplannedValue"
+          [(ngModel)]="newAttribute.plannedValue"
+          name="newAttributeplannedValue"
+        />
+      </td>
+      <td>
+        <input
+          class="form-control"
+          type="text"
+          pInputText
+          required
+          id="newAttributeactualValue"
+          [(ngModel)]="newAttribute.actualValue"
+          name="newAttributeactualValue"
+        />
+      </td>
+      <td>
+        <button
+          pButton
+          pRipple
+          type="button"
+          icon="pi pi-check"
+          (click)="onRowAddSave(newAttribute);"
+          class="p-button-rounded p-button-text p-button-success mr-2"
+        ></button>
+        <button
+          pRipple
+          pButton
+          type="button"
+          (click)="onRowCancelSave()"
+          icon="pi pi-times"
+          class="p-button-rounded p-button-text p-button-danger mr-2"
+        ></button>
+      </td>
+    </tr>
   </ng-template>
 </p-table>
+<button
+  pButton
+  type="button"
+  icon="pi pi-plus"
+  class="ui-button-info"
+  [label]="'Add'"
+  (click)="triggerAdd()"
+></button>

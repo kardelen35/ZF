@@ -1,43 +1,51 @@
-@import url("../node_modules/primeicons/primeicons.css");
-@import url("../node_modules/primeng/resources/themes/lara-light-indigo/theme.css");
-@import url("../node_modules/primeng/resources/primeng.min.css");
-body{
-    padding: 2rem;
+@import url('../node_modules/primeicons/primeicons.css');
+@import url('../node_modules/primeng/resources/themes/lara-light-indigo/theme.css');
+@import url('../node_modules/primeng/resources/primeng.min.css');
+body {
+  padding: 2rem;
 }
 :host ::ng-deep .p-rowgroup-footer td {
-    font-weight: 700;
+  font-weight: 700;
 }
 
-/* .p-datatable .p-datatable-header .ui-state-active ::ng-deep{
-    background-color: blueviolet !important;
-  }
-  p-table .myStyleClass {
-    background-color: aquamarine;
-    color: brown;
-
-  } */
-
-
-/* .p-datatable.p-datatable-gridlines .p-datatable-tbody > tr >td:hover{
-  background: rgb(5, 198, 223);
-}   */
-.p-datatable.p-datatable-gridlines .p-datatable-tbody  >tr >td{
+.p-datatable.p-datatable-gridlines .p-datatable-tbody > tr > td {
   background-color: #043050;
   color: white;
 }
-.p-datatable.p-datatable-gridlines .p-datatable-header{
+.p-datatable.p-datatable-gridlines .p-datatable-header {
   background-color: #043050;
 }
-.p-datatable.p-datatable-gridlines .p-datatable-thead > tr > th{
+.p-datatable.p-datatable-gridlines .p-datatable-thead > tr > th {
   background-color: #043050;
   color: white;
 }
-/* .p-datatable.p-datatable-gridlines .p-datatable-thead > tr > th:hover(none){
-background-color: transparent;
-} */
-.p-datatable .p-sortable-column .p-sortable-column-icon{
+
+.p-datatable .p-sortable-column .p-sortable-column-icon {
   color: white !important;
 }
 span.pi.pi-filter-icon.pi-filter {
   color: white;
 }
+
+.p-datatable .p-datatable-thead > tr > th {
+  position: -webkit-sticky;
+  position: sticky;
+  top: 0px;
+  width: 100%;
+
+}
+.p-column-filter-row {
+  width: fit-content !important;
+}
+.p-datatable.p-datatable-gridlines .p-datatable-tbody > tr > td{
+  padding:5px;
+  flex-wrap: wrap;
+
+}
+
+    @media screen and (max-width: 1800px) {
+    .p-datatable-wrapper {
+      overflow: auto;
+      width: 100%;
+    }
+  } 

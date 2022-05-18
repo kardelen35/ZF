@@ -33,4 +33,8 @@ export interface Product{
     price:number,
     stock:number,
 }
+export interface DataFilter{
+    value:any,
+    label:any
+}
 

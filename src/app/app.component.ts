@@ -1,687 +1,819 @@
-import { Component } from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
 import { LazyLoadEvent } from 'primeng/api';
-import { launchDimensions, Product } from './customer';
+import { DataFilter, launchDimensions, Product } from './customer';
 import { FormControl } from '@angular/forms';
-import { debounceTime, distinctUntilChanged, map, Observable, startWith } from 'rxjs';
+import {
+  debounceTime,
+  distinctUntilChanged,
+  map,
+  Observable,
+  startWith,
+  zip,
+} from 'rxjs';
 import * as FileSaver from 'file-saver';
 import { MetricTypePipe } from './metric-type.pipe';
-import {ViewEncapsulation} from '@angular/core'
-
-
-
+import { ViewEncapsulation } from '@angular/core';
+import { WireVersionPipe } from './wire-version.pipe';
+import { Table } from 'primeng/table';
+import { Directive, ElementRef } from '@angular/core';
+import { MaturityDTO } from './Model/maturityDTO';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css'],
-  encapsulation : ViewEncapsulation.Emulated
-
 })
 export class AppComponent {
   title = 'zf-project';
 
-  totalRecords: number; 
+  totalRecords: number;
   cols: any[];
-  
+
   selectedProducts: any[];
   loading: boolean;
-  dataHistory:boolean;
+  dataHistory: boolean;
   launchMaturity: any[];
   launchDimensions: any[];
-  products:any[];
-  productFormControl:FormControl
-  options:any[];
-  filteredOptions:Observable<string[] | null>;
-  exportColumns:any[];
-  localStorageData:any[];
-  formatData:any[];
-  sortableAndFilteredData:any[]
+  products: any[];
+  productFormControl: FormControl;
+  options: any[];
+  filteredOptions: Observable<string[] | null>;
+  exportColumns: any[];
+  localStorageData: any[];
+  formatData: any[];
+  sortableAndFilteredData: any[];
   selectAll: boolean = false;
+  exportable: boolean = false;
+  public addMode = false;
+  maturities: MaturityDTO;
+  public isDisabled: boolean = true;
+  public newAttribute: any = {};
   //Search
 
-  search:string;
+  search: string;
+  searchText: any;
   results: string[];
-  clonedProducts: any[];
+  clonedProducts: any;
 
-  constructor(private metricPipe:MetricTypePipe) {
-  }
-  
+  wireVersionFilters: DataFilter[];
+  @ViewChild('dt') table: Table;
+
+  constructor(
+    private metricPipe: MetricTypePipe,
+    private wirePipe: WireVersionPipe
+  ) {}
 
   ngOnInit() {
     this.productFormControl = new FormControl();
     this.filteredOptions = this.productFormControl.valueChanges.pipe(
-    startWith(''),
-    debounceTime(1000),
-    distinctUntilChanged(),
-    map(value=>this.productFilter(value))
-    )
-    
+      startWith(''),
+      debounceTime(1000),
+      distinctUntilChanged(),
+      map((value) => this.productFilter(value))
+    );
+
     this.launchMaturity = [
       {
-        launchMaturityId: 123,
-        projectNo: '0000025690',
-        lmVersion: null,
-        ldId: 18,
-        maturityOrderNo: 0,
-        category: 'ZF1',
-        metricResponsible: 'muhammed',
-        buildEvent: 'eventnew',
-        goal: 100.0,
-        firstValue: 82.0,
-        secondValue: 100.0,
-        actualValue: 82.0,
-        isReleased: true,
-        dateOfRelease: '2022-02-17T00:00:00',
-        amount: 123.0,
-        metricType: 'Percentage',
-        launchDimensionName: 'Product Approval (PPAP) for Purchased Components',
-      },
-      {
-        launchMaturityId: 406,
-        projectNo: '0000025690',
-        lmVersion: null,
-        ldId: 1,
-        maturityOrderNo: 0,
-        category: 'ZF1',
-        metricResponsible: 'muhammed',
-        buildEvent: 'eventnew',
-        goal: 100.0,
-        metricType: 'Number',
+        id: 233,
 
-        firstValue: 90.0,
-        secondValue: 100.0,
-        actualValue: 90.0,
-        isReleased: true,
-        dateOfRelease: '2022-02-17T00:00:00',
-        amount: 123.0,
-        launchDimensionName: 'Qualification of Shop Floor Staff',
-      },
-      {
-        launchMaturityId: 131,
-        projectNo: '0000025690',
-        lmVersion: null,
-        ldId: 46,
-        metricType: 'Percentage',
+        sdText: null,
 
-        maturityOrderNo: 0,
-        category: 'ZF1',
-        metricResponsible: 'muhammed',
-        buildEvent: 'eventnew',
-        goal: 100.0,
-        firstValue: 85.0,
-        secondValue: 87.0,
-        actualValue: 97.7,
-        isReleased: true,
-        dateOfRelease: '2022-02-17T00:00:00',
-        amount: 500.0,
-        launchDimensionName: 'Technical Availability',
-      },
-      {
-        launchMaturityId: 232,
-        projectNo: '0000025690',
-        lmVersion: null,
-        ldId: 56,
-        maturityOrderNo: 0,
-        metricType: 'Percentage',
+        projectNumber: '0000025690',
 
-        category: 'ZF1',
-        metricResponsible: 'muhammed',
-        buildEvent: 'eventnew',
-        goal: 87.0,
-        firstValue: 87.0,
-        secondValue: 100.0,
-        actualValue: 87.0,
-        isReleased: true,
-        dateOfRelease: '2022-02-18T00:00:00',
-        amount: 500.0,
-        launchDimensionName: 'OEE',
-      },
-      {
-        launchMaturityId: 319,
-        projectNo: '0000025690',
-        lmVersion: null,
-        ldId: 17,
-        metricType: 'Percentage',
+        version: '',
 
-        maturityOrderNo: 0,
-        category: 'ZF1',
-        metricResponsible: 'muhammed',
-        buildEvent: 'eventnew',
-        goal: 100.0,
-        firstValue: 23.0,
-        secondValue: 85.0,
-        actualValue: 27.06,
-        isReleased: true,
-        dateOfRelease: '2022-02-18T00:00:00',
-        amount: 5555.0,
-        launchDimensionName: 'Process Capability Analysis in Manufacturing',
-      },
-      {
-        launchMaturityId: 183,
-        projectNo: '0000025690',
-        lmVersion: null,
-        ldId: 45,
-        metricType: 'Percentage',
+        softwareDimensionId: 342,
 
-        maturityOrderNo: 0,
-        category: 'ZF1',
-        metricResponsible: 'muhammed',
-        buildEvent: 'eventnew',
-        goal: 83.0,
-        firstValue: 0.0,
-        secondValue: 0.0,
-        actualValue: 100.0,
-        isReleased: true,
-        dateOfRelease: '2022-02-18T00:00:00',
-        amount: 500.0,
-        launchDimensionName: '# of NCT',
-      },
-      {
-        launchMaturityId: 635,
-        projectNo: '0000025690',
-        lmVersion: null,
-        metricType: 'Percentage',
+        plannedValue: 1.0,
 
-        ldId: 34,
-        maturityOrderNo: 0,
-        category: 'ZF1',
-        metricResponsible: 'muhammed',
-        buildEvent: 'eventmuhammed',
-        goal: 470.0,
-        firstValue: 0.0,
-        secondValue: 0.0,
-        actualValue: 35.0,
-        isReleased: true,
-        dateOfRelease: '2022-02-20T00:00:00',
-        amount: 523.0,
-        launchDimensionName: '# of Pending Eng Changes',
-      },
-      {
-        launchMaturityId: 247,
-        projectNo: '0000025690',
-        lmVersion: null,
-        ldId: 109,
-        maturityOrderNo: 0,
-        metricType: 'Percentage',
+        actualValue: 2.0,
 
-        category: 'ZF1',
-        metricResponsible: 'muhammed',
-        buildEvent: 'eventmuhammed',
-        goal: 88.0,
-        firstValue: 0.0,
-        secondValue: 0.0,
-        actualValue: 47.0,
-        isReleased: true,
-        dateOfRelease: '2022-02-20T00:00:00',
-        amount: 523.0,
-        launchDimensionName: '# of Safety Incidents',
+        date: '2021-10-01T00:00:00',
       },
-      {
-        launchMaturityId: 71,
-        projectNo: '0000025690',
-        lmVersion: null,
-        ldId: 2,
-        maturityOrderNo: 0,
-        metricType: 'Percentage',
 
-        category: 'ZF1',
-        metricResponsible: 'muhammed',
-        buildEvent: 'eventnew',
-        goal: 100.0,
-        firstValue: 42.0,
-        secondValue: 300.0,
-        actualValue: 14.0,
-        isReleased: true,
-        dateOfRelease: '2022-02-20T00:00:00',
-        amount: 2300.0,
-        launchDimensionName: 'Process Approval',
-      },
       {
-        launchMaturityId: 355,
-        projectNo: '0000025690',
-        lmVersion: null,
-        ldId: 60,
-        maturityOrderNo: 0,
-        metricType: 'Percentage',
+        id: 118,
 
-        category: 'ZF1',
-        metricResponsible: 'muhammed',
-        buildEvent: 'eventnew',
-        goal: 10.0,
-        firstValue: 10.0,
-        secondValue: 100.0,
-        actualValue: 10.0,
-        isReleased: true,
-        dateOfRelease: '2022-02-20T00:00:00',
-        amount: 500.0,
-        launchDimensionName: 'Availability - Set Up Performance',
-      },
-      {
-        launchMaturityId: 136,
-        projectNo: '0000025690',
-        lmVersion: null,
-        metricType: 'Percentage',
+        sdText: null,
 
-        ldId: 16,
-        maturityOrderNo: 0,
-        category: 'ZF1',
-        metricResponsible: 'muhammed',
-        buildEvent: 'eventmuhammed',
-        goal: 67.0,
-        firstValue: 11.0,
-        secondValue: 32.0,
-        actualValue: 34.38,
-        isReleased: true,
-        dateOfRelease: '2022-02-20T00:00:00',
-        amount: 123.0,
-        launchDimensionName: 'Productivity - Fulfillment of Cycle Time',
-      },
-      {
-        launchMaturityId: 288,
-        projectNo: '0000025690',
-        lmVersion: null,
-        ldId: 29,
-        metricType: 'Percentage',
+        projectNumber: '0000025690',
 
-        maturityOrderNo: 0,
-        category: 'ZF1',
-        metricResponsible: 'muhammed',
-        buildEvent: 'eventnew',
-        goal: 100.0,
-        firstValue: 0.0,
-        secondValue: 0.0,
-        actualValue: 67.0,
-        isReleased: true,
-        dateOfRelease: '2022-02-17T00:00:00',
-        amount: 2300.0,
-        launchDimensionName: '# of Deviation Requests',
-      },
-      {
-        launchMaturityId: 2,
-        projectNo: '0000025690',
-        lmVersion: null,
-        ldId: 59,
-        metricType: 'Percentage',
+        version: '',
 
-        maturityOrderNo: 0,
-        category: 'ZF1',
-        metricResponsible: 'muhammed',
-        buildEvent: 'eventnew',
-        goal: 350.0,
-        firstValue: 0.0,
-        secondValue: 0.0,
-        actualValue: 270.0,
-        isReleased: true,
-        dateOfRelease: '2022-02-17T00:00:00',
-        amount: 500.0,
-        launchDimensionName: '# of Production Process Deviations',
-      },
-      {
-        launchMaturityId: 146,
-        projectNo: '0000025690',
-        lmVersion: null,
-        ldId: 49,
-        maturityOrderNo: 0,
-        metricType: 'Percentage',
+        softwareDimensionId: 322,
 
-        category: 'ZF1',
-        metricResponsible: 'muhammed',
-        buildEvent: 'eventnew',
-        goal: 100.0,
-        firstValue: 85.0,
-        secondValue: 90.0,
-        actualValue: 94.44,
-        isReleased: true,
-        dateOfRelease: '2022-02-17T00:00:00',
-        amount: 5000.0,
-        launchDimensionName:
-          'Product Approval (ISIR) for ZF In-House Components',
-      },
-      {
-        launchMaturityId: 141,
-        projectNo: '0000025690',
-        lmVersion: null,
-        metricType: 'Percentage',
+        plannedValue: 2.0,
 
-        ldId: 4,
-        maturityOrderNo: 0,
-        category: 'ZF1',
-        metricResponsible: 'muhammed',
-        buildEvent: 'eventnew',
-        goal: 93.0,
-        firstValue: 24.0,
-        secondValue: 48.0,
-        actualValue: 50.0,
-        isReleased: true,
-        dateOfRelease: '2022-02-17T00:00:00',
-        amount: 500.0,
-        launchDimensionName: 'Quality - First Pass Yield',
-      },
-      {
-        launchMaturityId: 263,
-        projectNo: '0000025690',
-        lmVersion: null,
-        ldId: 38,
-        maturityOrderNo: 0,
-        category: 'ZF1',
-        metricType: 'Percentage',
+        actualValue: 2.0,
 
-        metricResponsible: 'muhammed',
-        buildEvent: 'eventmuhammed',
-        goal: 50.0,
-        firstValue: 12.0,
-        secondValue: 25.0,
-        actualValue: 48.0,
-        isReleased: true,
-        dateOfRelease: '2022-02-17T00:00:00',
-        amount: 523.0,
-        launchDimensionName: 'Premium Freight',
+        date: '2021-10-01T00:00:00',
       },
+
       {
-        launchMaturityId: 219,
-        projectNo: '0000025690',
-        lmVersion: null,
-        ldId: 57,
-        metricType: 'Percentage',
-        maturityOrderNo: 0,
-        category: 'ZF1',
-        metricResponsible: 'muhammed',
-        buildEvent: 'eventnew',
-        goal: 470.0,
-        firstValue: 0.0,
-        secondValue: 0.0,
-        actualValue: 22.0,
-        isReleased: true,
-        dateOfRelease: '2022-02-17T00:00:00',
-        amount: 500.0,
-        launchDimensionName: '# of Open 8D for Purchased Components',
+        id: 148,
+
+        sdText: null,
+
+        projectNumber: '0000025690',
+
+        version: '',
+
+        softwareDimensionId: 378,
+
+        plannedValue: 2.0,
+
+        actualValue: 2.0,
+
+        date: '2021-10-01T00:00:00',
+      },
+
+      {
+        id: 168,
+
+        sdText: null,
+
+        projectNumber: '0000025690',
+
+        version: '',
+
+        softwareDimensionId: 342,
+
+        plannedValue: 2.0,
+
+        actualValue: 2.0,
+
+        date: '2021-11-01T00:00:00',
+      },
+
+      {
+        id: 213,
+
+        sdText: null,
+
+        projectNumber: '0000025690',
+
+        version: '',
+
+        softwareDimensionId: 322,
+
+        plannedValue: 3.0,
+
+        actualValue: 1.0,
+
+        date: '2021-11-01T00:00:00',
+      },
+
+      {
+        id: 155,
+
+        sdText: null,
+
+        projectNumber: '0000025690',
+
+        version: '',
+
+        softwareDimensionId: 378,
+
+        plannedValue: 6.0,
+
+        actualValue: 3.0,
+
+        date: '2021-11-01T00:00:00',
+      },
+
+      {
+        id: 257,
+
+        sdText: null,
+
+        projectNumber: '0000025690',
+
+        version: '',
+
+        softwareDimensionId: 342,
+
+        plannedValue: 0.0,
+
+        actualValue: 0.0,
+
+        date: '2021-11-02T18:30:00',
+      },
+
+      {
+        id: 224,
+
+        sdText: null,
+
+        projectNumber: '0000025690',
+
+        version: '',
+
+        softwareDimensionId: 322,
+
+        plannedValue: 0.0,
+
+        actualValue: 0.0,
+
+        date: '2021-11-02T18:30:00',
+      },
+
+      {
+        id: 285,
+
+        sdText: null,
+
+        projectNumber: '0000025690',
+
+        version: '',
+
+        softwareDimensionId: 378,
+
+        plannedValue: 0.0,
+
+        actualValue: 0.0,
+
+        date: '2021-11-02T18:30:00',
+      },
+
+      {
+        id: 135,
+
+        sdText: null,
+
+        projectNumber: '0000025690',
+
+        version: '',
+
+        softwareDimensionId: 342,
+
+        plannedValue: 1.0,
+
+        actualValue: 2.0,
+
+        date: '2021-11-11T09:22:05.833',
+      },
+
+      {
+        id: 134,
+
+        sdText: null,
+
+        projectNumber: '0000025690',
+
+        version: '',
+
+        softwareDimensionId: 237,
+
+        plannedValue: 5.0,
+
+        actualValue: 5.0,
+
+        date: '2021-11-11T09:22:05.833',
+      },
+
+      {
+        id: 194,
+
+        sdText: null,
+
+        projectNumber: '0000025690',
+
+        version: '',
+
+        softwareDimensionId: 342,
+
+        plannedValue: 1.0,
+
+        actualValue: 2.0,
+
+        date: '2021-11-11T09:22:35.913',
+      },
+
+      {
+        id: 120,
+
+        sdText: null,
+
+        projectNumber: '0000025690',
+
+        version: '',
+
+        softwareDimensionId: 237,
+
+        plannedValue: 5.0,
+
+        actualValue: 5.0,
+
+        date: '2021-11-11T09:22:35.913',
+      },
+
+      {
+        id: 312,
+
+        sdText: null,
+
+        projectNumber: '0000025690',
+
+        version: '',
+
+        softwareDimensionId: 342,
+
+        plannedValue: 2.0,
+
+        actualValue: 2.0,
+
+        date: '2021-12-02T18:30:00',
+      },
+
+      {
+        id: 245,
+
+        sdText: null,
+
+        projectNumber: '0000025690',
+
+        version: '',
+
+        softwareDimensionId: 322,
+
+        plannedValue: 2.0,
+
+        actualValue: 2.0,
+
+        date: '2021-12-02T18:30:00',
+      },
+
+      {
+        id: 188,
+
+        sdText: null,
+
+        projectNumber: '0000025690',
+
+        version: '',
+
+        softwareDimensionId: 378,
+
+        plannedValue: 2.0,
+
+        actualValue: 2.0,
+
+        date: '2021-12-02T18:30:00',
+      },
+
+      {
+        id: 367,
+
+        sdText: null,
+
+        projectNumber: '0000025690',
+
+        version: '',
+
+        softwareDimensionId: 342,
+
+        plannedValue: 2.0,
+
+        actualValue: 1.0,
+
+        date: '2022-02-02T23:00:00',
+      },
+
+      {
+        id: 277,
+
+        sdText: null,
+
+        projectNumber: '0000025690',
+
+        version: '',
+
+        softwareDimensionId: 322,
+
+        plannedValue: 3.0,
+
+        actualValue: 1.0,
+
+        date: '2022-02-02T23:00:00',
+      },
+
+      {
+        id: 280,
+
+        sdText: null,
+
+        projectNumber: '0000025690',
+
+        version: '',
+
+        softwareDimensionId: 378,
+
+        plannedValue: 3.0,
+
+        actualValue: 1.0,
+
+        date: '2022-02-02T23:00:00',
+      },
+
+      {
+        id: 338,
+
+        sdText: null,
+
+        projectNumber: '0000025690',
+
+        version: '',
+
+        softwareDimensionId: 342,
+
+        plannedValue: 1.0,
+
+        actualValue: 1.0,
+
+        date: '2022-03-02T21:00:00',
+      },
+
+      {
+        id: 256,
+
+        sdText: null,
+
+        projectNumber: '0000025690',
+
+        version: '',
+
+        softwareDimensionId: 322,
+
+        plannedValue: 3.0,
+
+        actualValue: 3.0,
+
+        date: '2022-03-02T21:00:00',
+      },
+
+      {
+        id: 453,
+
+        sdText: null,
+
+        projectNumber: '0000025690',
+
+        version: '',
+
+        softwareDimensionId: 378,
+
+        plannedValue: 0.0,
+
+        actualValue: 2.0,
+
+        date: '2022-03-02T21:00:00',
+      },
+
+      {
+        id: 499,
+
+        sdText: null,
+
+        projectNumber: '0000025690',
+
+        version: '',
+
+        softwareDimensionId: 342,
+
+        plannedValue: 2.0,
+
+        actualValue: 4.0,
+
+        date: '2022-04-02T21:00:00',
+      },
+
+      {
+        id: 322,
+
+        sdText: null,
+
+        projectNumber: '0000025690',
+
+        version: '',
+
+        softwareDimensionId: 269,
+
+        plannedValue: 3.0,
+
+        actualValue: 4.0,
+
+        date: '2022-04-02T21:00:00',
+      },
+
+      {
+        id: 383,
+
+        sdText: null,
+
+        projectNumber: '0000025690',
+
+        version: '',
+
+        softwareDimensionId: 322,
+
+        plannedValue: 2.0,
+
+        actualValue: 3.0,
+
+        date: '2022-04-02T21:00:00',
+      },
+
+      {
+        id: 501,
+
+        sdText: null,
+
+        projectNumber: '0000025690',
+
+        version: '',
+
+        softwareDimensionId: 378,
+
+        plannedValue: 1.0,
+
+        actualValue: 0.0,
+
+        date: '2022-04-02T21:00:00',
+      },
+
+      {
+        id: 308,
+
+        sdText: null,
+
+        projectNumber: '0000025690',
+
+        version: '',
+
+        softwareDimensionId: 342,
+
+        plannedValue: 2.0,
+
+        actualValue: 1.0,
+
+        date: '2022-08-02T21:00:00',
+      },
+
+      {
+        id: 565,
+
+        sdText: null,
+
+        projectNumber: '0000025690',
+
+        version: '',
+
+        softwareDimensionId: 269,
+
+        plannedValue: 0.0,
+
+        actualValue: 0.0,
+
+        date: '2022-08-02T21:00:00',
+      },
+
+      {
+        id: 340,
+
+        sdText: null,
+
+        projectNumber: '0000025690',
+
+        version: '',
+
+        softwareDimensionId: 322,
+
+        plannedValue: 2.0,
+
+        actualValue: 0.0,
+
+        date: '2022-08-02T21:00:00',
+      },
+
+      {
+        id: 625,
+
+        sdText: null,
+
+        projectNumber: '0000025690',
+
+        version: '',
+
+        softwareDimensionId: 378,
+
+        plannedValue: 0.0,
+
+        actualValue: 0.0,
+
+        date: '2022-08-02T21:00:00',
       },
     ];
-    
-    this.launchDimensions = [
-      {
-        id: 1,
-        name: 'Qualification of Shop Floor Staff',
-        cat: 'ZF12',
-        group: 'Organizational Maturity',
-        metricType: 'Percentage',
-      },
-      {
-        id: 49,
-        name: 'Product Approval (ISIR) for ZF In-House Components',
-        cat: 'ZF123',
-        group: 'Quality Performance',
-        metricType: 'Percentage',
-      },
-      {
-        id: 18,
-        name: 'Product Approval (PPAP) for Purchased Components',
-        cat: 'ZF123',
-        group: 'Quality Performance',
-        metricType: 'Percentage',
-      },
-      {
-        id: 17,
-        name: 'Process Capability Analysis in Manufacturing',
-        cat: 'ZF123',
-        group: 'Quality Performance',
-        metricType: 'Percentage',
-      },
-      {
-        id: 2,
-        name: 'Process Approval',
-        cat: 'ZF123',
-        group: 'Quality Performance',
-        metricType: 'Percentage',
-      },
-      {
-        id: 46,
-        name: 'Technical Availability',
-        cat: 'ZF12',
-        group: 'Productivity',
-        metricType: 'Percentage',
-      },
-      {
-        id: 4,
-        name: 'Quality - First Pass Yield',
-        cat: 'ZF123',
-        group: 'Productivity',
-        metricType: 'Percentage',
-      },
-      {
-        id: 16,
-        name: 'Productivity - Fulfillment of Cycle Time',
-        cat: 'ZF12',
-        group: 'Productivity',
-        metricType: 'Percentage',
-      },
-      {
-        id: 60,
-        name: 'Availability - Set Up Performance',
-        cat: 'ZF123',
-        group: 'Productivity',
-        metricType: 'Percentage',
-      },
-      {
-        id: 56,
-        name: 'OEE',
-        cat: 'ZF12',
-        group: 'Productivity',
-        metricType: 'Percentage',
-      },
-      {
-        id: 109,
-        name: '# of Safety Incidents',
-        cat: 'ZF1',
-        group: 'H and E',
-        metricType: 'Number',
-      },
-      {
-        id: 59,
-        name: '# of Production Process Deviations',
-        cat: 'ZF1',
-        group: 'Internal Quality',
-        metricType: 'Number',
-      },
-      {
-        id: 29,
-        name: '# of Deviation Requests',
-        cat: 'ZF1',
-        group: 'Internal Quality',
-        metricType: 'Number',
-      },
-      {
-        id: 34,
-        name: '# of Pending Eng Changes',
-        cat: 'ZF1',
-        group: 'Internal Quality',
-        metricType: 'Number',
-      },
-      {
-        id: 57,
-        name: '# of Open 8D for Purchased Components',
-        cat: 'ZF1',
-        group: 'External Quality',
-        metricType: 'Number',
-      },
-      {
-        id: 45,
-        name: '# of NCT',
-        cat: 'ZF1',
-        group: 'External Quality',
-        metricType: 'Number',
-      },
-      {
-        id: 38,
-        name: 'Premium Freight',
-        cat: 'ZF1',
-        group: 'Capital or Financial',
-        metricType: 'Percentage',
-      },
-    ];
+
     this.cols = [
-      { field: 'dateOfRelease', header: 'Date'},
-      { field: 'ldId', header: 'Id' },
-      { field: 'projectNo', header: 'Project' },
-      { field: 'maturityOrderNo', header: 'Maturity Order No' },
-      { field: 'category', header: 'Category' },
-      { field: 'amount', header: 'Amount' },
-      { field: 'metricType', header: 'Metric Type' },
+      { field: 'date', header: 'date' },
+      { field: 'id', header: 'id' },
+      { field: 'sdText', header: 'sdText' },
+      { field: 'projectNumber', header: 'projectNumber' },
+      { field: 'version', header: 'version' },
+      { field: 'softwareDimensionId', header: 'softwareDimensionId' },
+      { field: 'plannedValue', header: 'plannedValue' },
+      { field: 'actualValue', header: 'actualValue' },
+    ];
+    this.products = [
+      { id: 1, name: 'playstation', category: 'Game', price: 3000, stock: 2 },
+      { id: 2, name: 'player', category: 'Game', price: 2000, stock: 5 },
+      {
+        id: 3,
+        name: 'Bilgisayar',
+        category: 'Technology',
+        price: 8000,
+        stock: 8,
+      },
+      { id: 4, name: 'kindle', category: 'Books', price: 2000, stock: 4 },
+      {
+        id: 5,
+        name: 'coffee table',
+        category: 'Furniture',
+        price: 345,
+        stock: 6,
+      },
+      { id: 6, name: 'lamp', category: 'Books', price: 345, stock: 5 },
+      { id: 7, name: 'reeder', category: 'Books', price: 456, stock: 9 },
+    ];
 
+    this.formatProduct(this.launchMaturity);
+    this.handleFilter(this.formatData);
 
-  ];
-  this.formatProduct(this.launchMaturity)
-  this.handleFilter(this.formatData)
-  
+    //Search
+
+    this.exportColumns = this.cols.map((col) => ({
+      title: col.header,
+      dataKey: col.field,
+    }));
+  }
+  public formatProduct(value: any) {
+    this.formatData = [];
+    this.exportable = true;
+
+    value.map((a: any) => this.formatData.push(a));
+
+    // for (let i = 0; i < this.formatData.length; i++) {
+    //   let type = this.formatData[i].metricType;
+    //   let metric = this.metricPipe.transform(type);
+    //   this.formatData[i].metricType = metric;
+    // }
+  }
+  public handleFilter(value: any) {
+    this.sortableAndFilteredData = [];
+    if (this.exportable == true) {
+      value.filteredValue.map((a: any) => this.sortableAndFilteredData.push(a));
+    }
+  }
+  public prepareFilters(): void {
+    this.wireVersionFilters = [];
+    this.formatData.forEach((filtered) => {
+      const wireVersionFilter: DataFilter = {
+        value: filtered.value,
+        label: new WireVersionPipe().transform(filtered.value),
+      };
+      this.wireVersionFilters.findIndex(
+        (current) => current.value === wireVersionFilter.value
+      ) === -1
+        ? this.wireVersionFilters.push(wireVersionFilter)
+        : null;
+    });
+  }
+
+  public onwireVersionChange(event: any) {
+    const selectedValues = event.value.map(
+      (datatableFilter: any) => datatableFilter.value
+    );
+    this.table.filter(selectedValues, 'value', 'in');
+  }
 
   //Search
-    this.products = [
-      { id:1,name:"playstation",category:"Game",price:3000,stock:2},
-      { id:2,name:"player",category:"Game",price:2000,stock:5},
-      { id:3,name:"Bilgisayar",category:"Technology",price:8000,stock:8},
-      {id: 4,name: "kindle", category: "Books", price:2000, stock: 4},
-      {id: 5,name: "coffee table",category: "Furniture",price:345,stock: 6},
-      {id: 6,name: "lamp",category: "Books",price:345,stock: 5},
-      {id: 7,name: "reeder",category: "Books",price:456,stock: 9}
-    ]
-    this.exportColumns=this.cols.map(col=>({title:col.header,dataKey:col.field}));
-  }
-  public formatProduct(value:any){
-    this.formatData = []
-    value.map((a:any)=> this.formatData.push(a))
-    for(let i = 0; i<this.formatData.length; i++){
-      let type = this.formatData[i].metricType
-      let metric =this.metricPipe.transform(type)
-      this.formatData[i].metricType = metric
+  public searchProduct(event: any) {
+    console.log('Products', this.products);
+    let filtered: any[] = [];
+    let query = event.query;
+
+    for (let i = 0; i < this.products.length; i++) {
+      let p = this.products[i];
+
+      if (p.name.toLowerCase().indexOf(query.toLowerCase()) == 0) {
+        filtered.push(p.name);
+      }
+      this.results = filtered;
     }
+    let result = this.results.includes(query);
+
+    if (result == false) {
+      setTimeout(() => {
+        debounceTime(200);
+        let searchData = JSON.parse(localStorage.getItem('searchData') || '[]');
+        searchData += [];
+        const isDataMax = searchData.length;
+        const workingProduct = isDataMax ? searchData.split(',') : searchData;
+        const updateProduct = workingProduct.concat(query);
+        localStorage.setItem('searchData', JSON.stringify(updateProduct));
+      }, 1000);
+    }
+  }
+
+
+  //Edit
+  onRowEditInit(product: any) {
+    this.launchMaturity = { ...product };
+  }
+  onRowEditCancel(product: Product, index: number) {
+    this.formatData[index] = this.launchMaturity[product.id];
+    delete this.launchMaturity[product.id];
+  }
+  onRowEditSave(product: any) {
+    this.launchMaturity.push(product);
+    return this.launchMaturity;
+  }
+
+
+  //Add
+  triggerAdd() {
+     
+    this.addMode = !this.addMode;
+  }
+  onRowAddSave(customer: any) {
+    console.log("Customerr",customer)
+    console.log("New Att",Object.keys(this.newAttribute).length)
+    if(Object.keys(customer).length !== 0 ){
    
-  }
-  public handleFilter(value:any){
-    this.sortableAndFilteredData = [];
-    value.filteredValue.map((a:any)=>this.sortableAndFilteredData.push(a))
-  
-  }
-  //Search 
-  public searchProduct(event:any) {   
-      let filtered:any[] = [];
-      let query = event.query;
-      for(let i = 0; i<this.products.length; i++){
-        let p = this.products[i]
-        
-        if(p.name.toLowerCase().indexOf(query.toLowerCase()) == 0){
-          filtered.push(p.name)
-        }
-        this.results = filtered;
-      }
-      let result = this.results.includes(query)
-
-      if(result == false){
-        setTimeout(()=>{
-          debounceTime(200)
-          let searchData = JSON.parse(localStorage.getItem("searchData") || '[]')
-          searchData += []
-          const isDataMax = searchData.length
-          const workingProduct = isDataMax ? searchData.split(',') :searchData;
-          const updateProduct = workingProduct.concat(query);
-          localStorage.setItem("searchData",JSON.stringify(updateProduct))
-        },1000)
-      }
-}
-
-onRowEditInit(product: any) {
-
-  this.clonedProducts = {...product};
+      this.launchMaturity.push(customer);
+      this.formatProduct(this.launchMaturity);
+      this.addMode = false;
+      this.newAttribute = {};
+    }
  
-}
-onRowEditCancel(product: Product, index: number) {
-  this.formatData[index] = this.clonedProducts[product.id];
-  delete this.clonedProducts[product.id];
-}
-onRowEditSave(product: any) {
-  this.clonedProducts
-  this.clonedProducts = Object.keys(product)
-  return this.clonedProducts
+    
+    
+  }
+  onRowCancelSave() {
+    this.addMode = false;
+  }
 
-}
 
 
   exportExcel() {
-    import("xlsx").then(xlsx => {
-      console.log("xlsx",xlsx)
-        const worksheet = xlsx.utils.json_to_sheet(this.sortableAndFilteredData);
-        const workbook = { Sheets: { 'data': worksheet }, SheetNames: ['data'] };
-        const excelBuffer: any = xlsx.write(workbook, { bookType: 'xlsx', type: 'array' });
-        this.saveAsExcelFile(excelBuffer, "products");
+    import('xlsx').then((xlsx) => {
+      const worksheet = xlsx.utils.json_to_sheet(this.sortableAndFilteredData);
+      this.exportable = true;
+      const workbook = { Sheets: { data: worksheet }, SheetNames: ['data'] };
+      const excelBuffer: any = xlsx.write(workbook, {
+        bookType: 'xlsx',
+        type: 'array',
+      });
+      this.saveAsExcelFile(excelBuffer, 'products');
     });
-}
-
-
-saveAsExcelFile(buffer: any, fileName: string): void {
-  let EXCEL_TYPE = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8';
-  let EXCEL_EXTENSION = '.xlsx';
-  const data: Blob = new Blob([buffer], {
-      type: EXCEL_TYPE
-  });
-  FileSaver.saveAs(data, fileName + '_export_' + new Date().getTime() + EXCEL_EXTENSION);
-}
-  private productFilter(value:string):any[]{
-   let searchData = JSON.parse(localStorage.getItem("searchData") || '[]')
-   searchData += []
-   const isDataMax = searchData.length
-   const workingProduct = isDataMax ? searchData.split(',') :searchData;
-   const updateProduct = workingProduct.concat(value);
-
-   if(value && value != ""){
-    localStorage.setItem("searchData",JSON.stringify(updateProduct))
-    const localData = localStorage.getItem('searchData');
-    
-   }
-
-    this.options=this.products.map(product=>product.name)
-    const filterValue = value.toString().toLocaleLowerCase();
-    return this.options.filter(option =>option.toString().toLocaleLowerCase().includes(filterValue));
-
   }
 
+  saveAsExcelFile(buffer: any, fileName: string): void {
+    let EXCEL_TYPE =
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8';
+    let EXCEL_EXTENSION = '.xlsx';
+    const data: Blob = new Blob([buffer], {
+      type: EXCEL_TYPE,
+    });
+    FileSaver.saveAs(
+      data,
+      fileName + '_export_' + new Date().getTime() + EXCEL_EXTENSION
+    );
+  }
+  private productFilter(value: string): any[] {
+    let searchData = JSON.parse(localStorage.getItem('searchData') || '[]');
+    searchData += [];
+    const isDataMax = searchData.length;
+    const workingProduct = isDataMax ? searchData.split(',') : searchData;
+    const updateProduct = workingProduct.concat(value);
 
-  
-  // loadCustomers(event: LazyLoadEvent) {
-  //   setTimeout(() => {
-  //     this.launchDimensions.forEach((data) => {
-  //       const dimensionsData = Object.keys(data);
-  //       this.totalRecords = dimensionsData.length;
-  //     });
-  //   }, 1000);
-  // }
+    if (value && value != '') {
+      localStorage.setItem('searchData', JSON.stringify(updateProduct));
+      const localData = localStorage.getItem('searchData');
+    }
+
+    this.options = this.products.map((product) => product.name);
+    const filterValue = value.toString().toLocaleLowerCase();
+    return this.options.filter((option) =>
+      option.toString().toLocaleLowerCase().includes(filterValue)
+    );
+  }
 
   onSelectionChange(value = []) {
-    console.log("Value[] =>",value)
     this.selectAll = value.length === this.totalRecords;
 
     this.selectedProducts = value;
-}
-// onSelectAllChange(event:any) {
-//   console.log("Event",event)
-//   const checked = event.checked;
-
-//   if (checked) {
-//     this.formatData.map((format)=>{
-//       this.selectedProducts=format
-//       this.selectAll=true
-//     });
-//     console.log("SelectAll",this.selectAll)
-
-//       // this.customerService.getCustomers().then(res => {
-//       //     this.selectedCustomers = res.customers;
-//       //     this.selectAll = true;
-//       // });
-//   }
-//   else {
-
-//       this.selectedProducts = [];
-//       this.selectAll = false;
-//   }
-// }
+  }
 
   customSort(event: any) {
     event.data.sort((data1: any, data2: any) => {
