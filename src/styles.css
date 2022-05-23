@@ -42,7 +42,6 @@ span.pi.pi-filter-icon.pi-filter {
   flex-wrap: wrap;
 
 }
-
     @media screen and (max-width: 1800px) {
     .p-datatable-wrapper {
       overflow: auto;

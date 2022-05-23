@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { launchDimensions, launchMaturity } from './customer';
+import { launchDimensions, launchMaturity } from '../Model/customer';
 
 
 

@@ -3,7 +3,6 @@ import { BrowserModule } from '@angular/platform-browser';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
-import {TableModule} from 'primeng/table';
 import {ButtonModule} from 'primeng/button';
 import {AccordionModule} from 'primeng/accordion';     
 import {MenuItem} from 'primeng/api';  
@@ -21,14 +20,16 @@ import {DropdownModule} from 'primeng/dropdown';
 import {ProgressBarModule} from 'primeng/progressbar';
 import { HttpClientModule } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
-import { MetricTypePipe } from './metric-type.pipe';
+import { MetricTypePipe } from './Pipe/metric-type.pipe';
 import { ReactiveFormsModule} from '@angular/forms';
 import {MatAutocompleteModule} from '@angular/material/autocomplete';
 import {MatInputModule} from '@angular/material/input';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { PercentPipe } from '@angular/common';
 import {AutoCompleteModule} from 'primeng/autocomplete';
-import { WireVersionPipe } from './wire-version.pipe';
+import { WireVersionPipe } from '../app/Pipe/wire-version.pipe';
+import {TableModule} from 'primeng/table';
+
 
 
 @NgModule({
@@ -60,7 +61,7 @@ import { WireVersionPipe } from './wire-version.pipe';
     MatAutocompleteModule,
     MatInputModule,
     BrowserAnimationsModule,
-    AutoCompleteModule,
+    AutoCompleteModule
     
     
     

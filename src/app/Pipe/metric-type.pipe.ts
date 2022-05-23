@@ -13,13 +13,4 @@ export class MetricTypePipe implements PipeTransform {
         return '#'
     }
   }
-  // transform(value: number, metricType: string): string {
-  //   console.log("Value :",value + "" + "Metric Type",metricType)
-  //   switch (metricType) {
-  //     case '%': 
-  //       return `${value}`;
-  //     default: 
-  //       return '--'
-  //   }
-  // }
 }

@@ -69,14 +69,28 @@
 
   <ng-template pTemplate="header" let-customerData>
     <tr>
-      <th style="width: 3rem">
+      <!-- <th style="width: 3rem">
         <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
-      </th>
+      </th> -->
       <th>
         <p-columnFilter
           matchMode="contains"
           type="text"
           field="date"
+        ></p-columnFilter>
+      </th>
+      <th>
+        <p-columnFilter
+          matchMode="contains"
+          type="text"
+          field="plannedValue"
+        ></p-columnFilter>
+      </th>
+      <th>
+        <p-columnFilter
+          matchMode="contains"
+          type="text"
+          field="actualValue"
         ></p-columnFilter>
       </th>
       <th>
@@ -90,7 +104,7 @@
         <p-columnFilter
           matchMode="contains"
           type="text"
-          field="sdText"
+          field="sDText"
         ></p-columnFilter>
       </th>
 
@@ -116,35 +130,28 @@
           field="softwareDimensionId"
         ></p-columnFilter>
       </th>
-      <th>
-        <p-columnFilter
-          matchMode="contains"
-          type="text"
-          field="plannedValue"
-        ></p-columnFilter>
-      </th>
-      <th>
-        <p-columnFilter
-          matchMode="contains"
-          type="text"
-          field="actualValue"
-        ></p-columnFilter>
-      </th>
+     
 
       <th></th>
     </tr>
 
     <tr>
-      <th style="width: 3rem"></th>
+      <!-- <th style="width: 3rem"></th> -->
 
       <th pResizableColumn pSortableColumn="date">
         Date <p-sortIcon field="date"></p-sortIcon>
       </th>
+      <th pResizableColumn pSortableColumn="plannedValue">
+        plannedValue <p-sortIcon field="plannedValue"></p-sortIcon>
+      </th>
+      <th pResizableColumn pSortableColumn="actualValue">
+        Actual Value <p-sortIcon field="actualValue"></p-sortIcon>
+      </th>
       <th pResizableColumn pSortableColumn="id">
         Id <p-sortIcon field="id"></p-sortIcon>
       </th>
-      <th pResizableColumn pSortableColumn="sdText">
-        sdText <p-sortIcon field="sdText"></p-sortIcon>
+      <th pResizableColumn pSortableColumn="sDText">
+        sDText <p-sortIcon field="sDText"></p-sortIcon>
       </th>
       <th pResizableColumn pSortableColumn="projectNumber">
         project Number <p-sortIcon field="projectNumber"></p-sortIcon>
@@ -155,12 +162,7 @@
       <th pResizableColumn pSortableColumn="softwareDimensionId">
         Software Dimension <p-sortIcon field="softwareDimensionId"></p-sortIcon>
       </th>
-      <th pResizableColumn pSortableColumn="plannedValue">
-        plannedValue <p-sortIcon field="plannedValue"></p-sortIcon>
-      </th>
-      <th pResizableColumn pSortableColumn="actualValue">
-        Actual Value <p-sortIcon field="actualValue"></p-sortIcon>
-      </th>
+  
 
       <th pResizableColumn></th>
     </tr>
@@ -177,11 +179,11 @@
     let-rowspan="rowspan"
   >
     <tr [pEditableRow]="customer">
-      <td>
+      <!-- <td>
         <p-tableCheckbox [value]="customer"></p-tableCheckbox>
-      </td>
+      </td> -->
 
-      <td>
+      <td  *ngIf="!editing; else elseBlock">
         <p-cellEditor>
           <ng-template pTemplate="input">
             <input type="text" pInputText [(ngModel)]="customer.date" />
@@ -191,6 +193,34 @@
           </ng-template>
         </p-cellEditor>
       </td>
+      <td>
+        <p-cellEditor>
+          <ng-template pTemplate="input">
+            <input type="text" pInputText [(ngModel)]="customer.plannedValue" />
+          </ng-template>
+          <ng-template pTemplate="output">
+            {{ customer.plannedValue }}
+          </ng-template>
+        </p-cellEditor>
+      </td>
+      <td>
+        <p-cellEditor>
+          <ng-template pTemplate="input">
+            <input type="text" pInputText [(ngModel)]="customer.actualValue" />
+          </ng-template>
+          <ng-template pTemplate="output">
+            {{ customer.actualValue }}
+          </ng-template>
+        </p-cellEditor>
+      </td>
+      
+        <ng-template #elseBlock >
+         
+            
+          
+        </ng-template>
+      
+
       <td>
         <p-cellEditor>
           <ng-template pTemplate="input">
@@ -204,10 +234,10 @@
       <td>
         <p-cellEditor>
           <ng-template pTemplate="input">
-            <input type="text" pInputText [(ngModel)]="customer.sdText" />
+            <input type="text" pInputText [(ngModel)]="customer.sDText" />
           </ng-template>
           <ng-template pTemplate="output">
-            {{ customer.sdText }}
+            {{ customer.sDText }}
           </ng-template>
         </p-cellEditor>
       </td>
@@ -250,26 +280,7 @@
           </ng-template>
         </p-cellEditor>
       </td>
-      <td>
-        <p-cellEditor>
-          <ng-template pTemplate="input">
-            <input type="text" pInputText [(ngModel)]="customer.plannedValue" />
-          </ng-template>
-          <ng-template pTemplate="output">
-            {{ customer.plannedValue }}
-          </ng-template>
-        </p-cellEditor>
-      </td>
-      <td>
-        <p-cellEditor>
-          <ng-template pTemplate="input">
-            <input type="text" pInputText [(ngModel)]="customer.actualValue" />
-          </ng-template>
-          <ng-template pTemplate="output">
-            {{ customer.actualValue }}
-          </ng-template>
-        </p-cellEditor>
-      </td>
+      
 
       <td
         style="text-align: center"
@@ -302,21 +313,32 @@
           type="button"
           pCancelEditableRow
           icon="pi pi-times"
-          (click)="onRowEditCancel(customer, ri)"
           class="p-button-rounded p-button-text p-button-danger"
         ></button>
       </td>
     </tr>
-    <tr *ngIf="addMode && ri === formatData.length - 1 || formatData.length<=1">
-      <td></td>
+
+    <tr *ngIf="addMode && ri === formatData.length - 1 ">
       <td rowspan="2">
         <p-calendar
-          appendTo="body"
-          inputId="basic"
-          [(ngModel)]="newAttribute.date"
-        ></p-calendar>
+        appendTo="body"
+        inputId="basic"
+        [(ngModel)]="newAttribute.date"
+      ></p-calendar>
       </td>
-      <td>
+      <td class="pl-0">Plan</td>
+      <td >
+        <input
+        class="form-control"
+        type="text"
+        pInputText
+        required
+        id="newAttributeplannedValue"
+        [(ngModel)]="newAttribute.plannedValue"
+        name="newAttributeplannedValue"
+      />
+      </td>
+      <td >
         <input
           class="form-control"
           type="text"
@@ -334,9 +356,9 @@
           type="text"
           pInputText
           required
-          id="newAttributesdText"
-          [(ngModel)]="newAttribute.sdText"
-          name="newAttributesdText"
+          id="newAttributesDText"
+          [(ngModel)]="newAttribute.sDText"
+          name="newAttributesDText"
         />
       </td>
       <td>
@@ -350,7 +372,6 @@
           name="newAttributeprojectNumber"
         />
       </td>
-
       <td>
         <input
           class="form-control"
@@ -368,22 +389,15 @@
           type="text"
           pInputText
           required
-          id="newAttributesoftwareDimensionId"
-          [(ngModel)]="newAttribute.softwareDimensionId"
-          name="newAttributesoftwareDimensionId"
-        />
-      </td>
-      <td>
-        <input
-          class="form-control"
-          type="text"
-          pInputText
-          required
           id="newAttributeplannedValue"
-          [(ngModel)]="newAttribute.plannedValue"
+          [(ngModel)]="newAttribute.softwareDimensionId"
           name="newAttributeplannedValue"
         />
       </td>
+    </tr>
+
+    <tr *ngIf="addMode && ri === formatData.length - 1 ">
+      <td class="pl-0">Actual</td>
       <td>
         <input
           class="form-control"
@@ -393,6 +407,63 @@
           id="newAttributeactualValue"
           [(ngModel)]="newAttribute.actualValue"
           name="newAttributeactualValue"
+        />
+      </td>
+      <td >
+        <input
+          class="form-control"
+          type="text"
+          pInputText
+          required
+          value="id"
+          id="newAttributeid"
+          [(ngModel)]="newAttribute.id"
+          name="newAttributeid"
+        />
+      </td>
+      <td>
+        <input
+          class="form-control"
+          type="text"
+          pInputText
+          required
+          id="newAttributesDText"
+          [(ngModel)]="newAttribute.sDText"
+          name="newAttributesDText"
+        />
+      </td>
+      <td>
+        <input
+          class="form-control"
+          type="text"
+          pInputText
+          required
+          id="newAttributeprojectNumber"
+          [(ngModel)]="newAttribute.projectNumber"
+          name="newAttributeprojectNumber"
+        />
+      </td>
+      <td>
+        <input
+          class="form-control"
+          type="text"
+          pInputText
+          required
+          id="newAttributeversion"
+          [(ngModel)]="newAttribute.version"
+          name="newAttributeversion"
+        />
+      </td>
+
+      <td>
+        <input
+          class="form-control"
+          type="text"
+          pInputText
+          required
+          id="newAttributesoftwareDimensionId"
+          [(ngModel)]="newAttribute.softwareDimensionId"
+          name="newAttributesoftwareDimensionId"
         />
       </td>
       <td>
@@ -413,7 +484,10 @@
           class="p-button-rounded p-button-text p-button-danger mr-2"
         ></button>
       </td>
+      
     </tr>
+
+   
   </ng-template>
 </p-table>
 <button

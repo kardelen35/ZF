@@ -1,6 +1,6 @@
 import { Component, ViewChild } from '@angular/core';
 import { LazyLoadEvent } from 'primeng/api';
-import { DataFilter, launchDimensions, Product } from './customer';
+import { DataFilter, launchDimensions, Product } from '../app/Model/customer';
 import { FormControl } from '@angular/forms';
 import {
   debounceTime,
@@ -11,9 +11,9 @@ import {
   zip,
 } from 'rxjs';
 import * as FileSaver from 'file-saver';
-import { MetricTypePipe } from './metric-type.pipe';
+import { MetricTypePipe } from '../app/Pipe/metric-type.pipe';
 import { ViewEncapsulation } from '@angular/core';
-import { WireVersionPipe } from './wire-version.pipe';
+import { WireVersionPipe } from '../app/Pipe/wire-version.pipe';
 import { Table } from 'primeng/table';
 import { Directive, ElementRef } from '@angular/core';
 import { MaturityDTO } from './Model/maturityDTO';
@@ -26,41 +26,32 @@ import { MaturityDTO } from './Model/maturityDTO';
 export class AppComponent {
   title = 'zf-project';
 
-  totalRecords: number;
-  cols: any[];
-
-  selectedProducts: any[];
-  loading: boolean;
-  dataHistory: boolean;
-  launchMaturity: any[];
-  launchDimensions: any[];
-  products: any[];
-  productFormControl: FormControl;
-  options: any[];
-  filteredOptions: Observable<string[] | null>;
-  exportColumns: any[];
-  localStorageData: any[];
-  formatData: any[];
-  sortableAndFilteredData: any[];
-  selectAll: boolean = false;
-  exportable: boolean = false;
+  public totalRecords: number;
+  public cols: any[];
+  public selectedProducts: any[];
+  public loading: boolean;
+  public launchMaturity: any[];
+  public exportColumns: any[];
+  public formatData: any[];
+  public sortableAndFilteredData: any[];
+  public selectAll = false;
+  public exportable = false;
   public addMode = false;
-  maturities: MaturityDTO;
-  public isDisabled: boolean = true;
+  public isDisabled = true;
   public newAttribute: any = {};
-  //Search
-
-  search: string;
-  searchText: any;
-  results: string[];
-  clonedProducts: any;
-
-  wireVersionFilters: DataFilter[];
+  public clonedProducts: any;
+  public products: any[];
+  public productFormControl: FormControl;
+  public options: any[];
+  public filteredOptions: Observable<string[] | null>;
+  public search: string;
+  public searchText: any;
+  public results: string[];
   @ViewChild('dt') table: Table;
+
 
   constructor(
     private metricPipe: MetricTypePipe,
-    private wirePipe: WireVersionPipe
   ) {}
 
   ngOnInit() {
@@ -76,7 +67,7 @@ export class AppComponent {
       {
         id: 233,
 
-        sdText: null,
+        sDText: null,
 
         projectNumber: '0000025690',
 
@@ -94,7 +85,7 @@ export class AppComponent {
       {
         id: 118,
 
-        sdText: null,
+        sDText: null,
 
         projectNumber: '0000025690',
 
@@ -112,7 +103,7 @@ export class AppComponent {
       {
         id: 148,
 
-        sdText: null,
+        sDText: null,
 
         projectNumber: '0000025690',
 
@@ -130,7 +121,7 @@ export class AppComponent {
       {
         id: 168,
 
-        sdText: null,
+        sDText: null,
 
         projectNumber: '0000025690',
 
@@ -148,7 +139,7 @@ export class AppComponent {
       {
         id: 213,
 
-        sdText: null,
+        sDText: null,
 
         projectNumber: '0000025690',
 
@@ -166,7 +157,7 @@ export class AppComponent {
       {
         id: 155,
 
-        sdText: null,
+        sDText: null,
 
         projectNumber: '0000025690',
 
@@ -184,7 +175,7 @@ export class AppComponent {
       {
         id: 257,
 
-        sdText: null,
+        sDText: null,
 
         projectNumber: '0000025690',
 
@@ -202,7 +193,7 @@ export class AppComponent {
       {
         id: 224,
 
-        sdText: null,
+        sDText: null,
 
         projectNumber: '0000025690',
 
@@ -220,7 +211,7 @@ export class AppComponent {
       {
         id: 285,
 
-        sdText: null,
+        sDText: null,
 
         projectNumber: '0000025690',
 
@@ -238,7 +229,7 @@ export class AppComponent {
       {
         id: 135,
 
-        sdText: null,
+        sDText: null,
 
         projectNumber: '0000025690',
 
@@ -256,7 +247,7 @@ export class AppComponent {
       {
         id: 134,
 
-        sdText: null,
+        sDText: null,
 
         projectNumber: '0000025690',
 
@@ -274,7 +265,7 @@ export class AppComponent {
       {
         id: 194,
 
-        sdText: null,
+        sDText: null,
 
         projectNumber: '0000025690',
 
@@ -292,7 +283,7 @@ export class AppComponent {
       {
         id: 120,
 
-        sdText: null,
+        sDText: null,
 
         projectNumber: '0000025690',
 
@@ -310,7 +301,7 @@ export class AppComponent {
       {
         id: 312,
 
-        sdText: null,
+        sDText: null,
 
         projectNumber: '0000025690',
 
@@ -328,7 +319,7 @@ export class AppComponent {
       {
         id: 245,
 
-        sdText: null,
+        sDText: null,
 
         projectNumber: '0000025690',
 
@@ -346,7 +337,7 @@ export class AppComponent {
       {
         id: 188,
 
-        sdText: null,
+        sDText: null,
 
         projectNumber: '0000025690',
 
@@ -364,7 +355,7 @@ export class AppComponent {
       {
         id: 367,
 
-        sdText: null,
+        sDText: null,
 
         projectNumber: '0000025690',
 
@@ -382,7 +373,7 @@ export class AppComponent {
       {
         id: 277,
 
-        sdText: null,
+        sDText: null,
 
         projectNumber: '0000025690',
 
@@ -400,7 +391,7 @@ export class AppComponent {
       {
         id: 280,
 
-        sdText: null,
+        sDText: null,
 
         projectNumber: '0000025690',
 
@@ -418,7 +409,7 @@ export class AppComponent {
       {
         id: 338,
 
-        sdText: null,
+        sDText: null,
 
         projectNumber: '0000025690',
 
@@ -436,7 +427,7 @@ export class AppComponent {
       {
         id: 256,
 
-        sdText: null,
+        sDText: null,
 
         projectNumber: '0000025690',
 
@@ -454,7 +445,7 @@ export class AppComponent {
       {
         id: 453,
 
-        sdText: null,
+        sDText: null,
 
         projectNumber: '0000025690',
 
@@ -472,7 +463,7 @@ export class AppComponent {
       {
         id: 499,
 
-        sdText: null,
+        sDText: null,
 
         projectNumber: '0000025690',
 
@@ -490,7 +481,7 @@ export class AppComponent {
       {
         id: 322,
 
-        sdText: null,
+        sDText: null,
 
         projectNumber: '0000025690',
 
@@ -508,7 +499,7 @@ export class AppComponent {
       {
         id: 383,
 
-        sdText: null,
+        sDText: null,
 
         projectNumber: '0000025690',
 
@@ -526,7 +517,7 @@ export class AppComponent {
       {
         id: 501,
 
-        sdText: null,
+        sDText: null,
 
         projectNumber: '0000025690',
 
@@ -544,7 +535,7 @@ export class AppComponent {
       {
         id: 308,
 
-        sdText: null,
+        sDText: null,
 
         projectNumber: '0000025690',
 
@@ -562,7 +553,7 @@ export class AppComponent {
       {
         id: 565,
 
-        sdText: null,
+        sDText: null,
 
         projectNumber: '0000025690',
 
@@ -580,7 +571,7 @@ export class AppComponent {
       {
         id: 340,
 
-        sdText: null,
+        sDText: null,
 
         projectNumber: '0000025690',
 
@@ -598,7 +589,7 @@ export class AppComponent {
       {
         id: 625,
 
-        sdText: null,
+        sDText: null,
 
         projectNumber: '0000025690',
 
@@ -617,7 +608,7 @@ export class AppComponent {
     this.cols = [
       { field: 'date', header: 'date' },
       { field: 'id', header: 'id' },
-      { field: 'sdText', header: 'sdText' },
+      { field: 'sDText', header: 'sDText' },
       { field: 'projectNumber', header: 'projectNumber' },
       { field: 'version', header: 'version' },
       { field: 'softwareDimensionId', header: 'softwareDimensionId' },
@@ -649,19 +640,26 @@ export class AppComponent {
     this.formatProduct(this.launchMaturity);
     this.handleFilter(this.formatData);
 
-    //Search
-
     this.exportColumns = this.cols.map((col) => ({
       title: col.header,
       dataKey: col.field,
     }));
   }
+
   public formatProduct(value: any) {
     this.formatData = [];
     this.exportable = true;
+if(value===[]){
+  this.formatData.push(new MaturityDTO());
 
-    value.map((a: any) => this.formatData.push(a));
+}
+else{
+  value.map((a: any) => {
 
+      console.log("78858test");
+      this.formatData.push(a);
+    } );
+}
     // for (let i = 0; i < this.formatData.length; i++) {
     //   let type = this.formatData[i].metricType;
     //   let metric = this.metricPipe.transform(type);
@@ -674,20 +672,7 @@ export class AppComponent {
       value.filteredValue.map((a: any) => this.sortableAndFilteredData.push(a));
     }
   }
-  public prepareFilters(): void {
-    this.wireVersionFilters = [];
-    this.formatData.forEach((filtered) => {
-      const wireVersionFilter: DataFilter = {
-        value: filtered.value,
-        label: new WireVersionPipe().transform(filtered.value),
-      };
-      this.wireVersionFilters.findIndex(
-        (current) => current.value === wireVersionFilter.value
-      ) === -1
-        ? this.wireVersionFilters.push(wireVersionFilter)
-        : null;
-    });
-  }
+
 
   public onwireVersionChange(event: any) {
     const selectedValues = event.value.map(
@@ -698,7 +683,7 @@ export class AppComponent {
 
   //Search
   public searchProduct(event: any) {
-    console.log('Products', this.products);
+   
     let filtered: any[] = [];
     let query = event.query;
 
@@ -730,10 +715,7 @@ export class AppComponent {
   onRowEditInit(product: any) {
     this.launchMaturity = { ...product };
   }
-  onRowEditCancel(product: Product, index: number) {
-    this.formatData[index] = this.launchMaturity[product.id];
-    delete this.launchMaturity[product.id];
-  }
+
   onRowEditSave(product: any) {
     this.launchMaturity.push(product);
     return this.launchMaturity;
@@ -743,11 +725,9 @@ export class AppComponent {
   //Add
   triggerAdd() {
      
-    this.addMode = !this.addMode;
+   this.addMode = !this.addMode;
   }
   onRowAddSave(customer: any) {
-    console.log("Customerr",customer)
-    console.log("New Att",Object.keys(this.newAttribute).length)
     if(Object.keys(customer).length !== 0 ){
    
       this.launchMaturity.push(customer);
@@ -755,8 +735,6 @@ export class AppComponent {
       this.addMode = false;
       this.newAttribute = {};
     }
- 
-    
     
   }
   onRowCancelSave() {
