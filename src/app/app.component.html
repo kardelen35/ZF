@@ -69,9 +69,7 @@
 
   <ng-template pTemplate="header" let-customerData>
     <tr>
-      <!-- <th style="width: 3rem">
-        <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
-      </th> -->
+  
       <th>
         <p-columnFilter
           matchMode="contains"
@@ -136,7 +134,6 @@
     </tr>
 
     <tr>
-      <!-- <th style="width: 3rem"></th> -->
 
       <th pResizableColumn pSortableColumn="date">
         Date <p-sortIcon field="date"></p-sortIcon>
@@ -179,9 +176,7 @@
     let-rowspan="rowspan"
   >
     <tr [pEditableRow]="customer">
-      <!-- <td>
-        <p-tableCheckbox [value]="customer"></p-tableCheckbox>
-      </td> -->
+     
 
       <td  *ngIf="!editing; else elseBlock">
         <p-cellEditor>
